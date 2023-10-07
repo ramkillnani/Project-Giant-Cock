@@ -59,16 +59,17 @@ MonoBehaviour:
     DefaultToAlwaysTrueCondition: 1
   LogFileChanges: 0
   CacheStateSets: 0
+  CacheAllDesignsOnBuild: 1
   UseCustomIcons: 1
   EasyStateFolder: Assets\EasyState
   BackgroundColor: {r: 0.08627451, g: 0.1176471, b: 0.1764706, a: 1}
   ToolbarColor: {r: 0.05490196, g: 0.07450981, b: 0.1137255, a: 1}
-  DataTypeIcon: {fileID: 2800000, guid: 8bed3c42b2006744793483e311b68499, type: 3}
-  ActionIcon: {fileID: 2800000, guid: 4ac44bdda2f1a18469da1f6246f1ec6c, type: 3}
-  ConditionIcon: {fileID: 2800000, guid: 658d84793ea1e6f4ab30ca0271a33246, type: 3}
-  EvaluatorIcon: {fileID: 2800000, guid: b6496dba7e9e930468df5d54539b8ceb, type: 3}
-  EventHandlerIcon: {fileID: 2800000, guid: 8558c7bbcc35051429d9ae900b88e515, type: 3}
-  StateMachineIcon: {fileID: 2800000, guid: 02f16937c3380b94d87b8d536e09ecf4, type: 3}
+  DataTypeIcon: {fileID: 0}
+  ActionIcon: {fileID: 0}
+  ConditionIcon: {fileID: 0}
+  EvaluatorIcon: {fileID: 0}
+  EventHandlerIcon: {fileID: 0}
+  StateMachineIcon: {fileID: 0}
   ComponentAddedData:
     ChangeWaiting: 0
     TargetInstanceID: 0

@@ -22,9 +22,8 @@ public class PlayerController : MonoBehaviour
 	public Settings settings;
 
 	// Variables that will be used in runtime
-	
-	#endregion
 
+	#endregion
 
 	private void Start()
 	{
@@ -33,13 +32,16 @@ public class PlayerController : MonoBehaviour
 			physics.playerBody = GetComponent<Rigidbody>();
 		}
 
+		physics.playerTransform = transform;
+
 		// Lock the cursor to the center of the screen
 		Cursor.lockState = CursorLockMode.Locked;
 
 		// Apply player model
 		ApplyPlayerModel(models.selectedPlayerIndex);
 
-		physics.playerTransform = transform;
+		// Apply animations
+		ApplyAnimationClips();
 	}
 
 	private void Update()
@@ -67,35 +69,28 @@ public class PlayerController : MonoBehaviour
 
 	void ProcessPhysics()
 	{
-		float speed = 0;
+		float speed = movement.walkSpeed;  // Default to walking speed
 
-		if (movement.type == Movement.MovementType.Walking)
+		switch (movement.type)
 		{
-			speed = movement.walkSpeed;
-		}
-		else if (movement.type == Movement.MovementType.Running)
-		{
-			speed = movement.runSpeed;
-		}
-		else if (movement.type == Movement.MovementType.Crouching)
-		{
-			speed = movement.crouchSpeed;
-		}
-		else if (movement.type == Movement.MovementType.Climbing)
-		{
-			speed = movement.climbSpeed;
-		}
-		else if (movement.type == Movement.MovementType.Swimming)
-		{
-			speed = movement.swimSpeed;
+			case Movement.MovementType.Running:
+				speed = movement.runSpeed;
+				break;
+			case Movement.MovementType.Crouching:
+				speed = movement.crouchSpeed;
+				break;
+			case Movement.MovementType.Climbing:
+				speed = movement.climbSpeed;
+				break;
+			case Movement.MovementType.Swimming:
+				speed = movement.swimSpeed;
+				break;
 		}
 
-		//float speed = (Input.GetKey(KeyCode.LeftShift)) ? movement.runSpeed : movement.walkSpeed;
 		Vector3 move = physics.moveDirection * speed * Time.fixedDeltaTime;
-
-		// Move the player
 		physics.playerBody.MovePosition(physics.playerBody.position + move);
 	}
+
 
 	void Rotate()
 	{
@@ -117,14 +112,19 @@ public class PlayerController : MonoBehaviour
 
 	void Move()
 	{
-		// Handle player movement
 		float moveForwardBackward = Input.GetAxis("Vertical");
 		float moveLeftRight = Input.GetAxis("Horizontal");
 
-		physics.moveDirection = transform.right * moveLeftRight + transform.forward * moveForwardBackward;
+		Vector3 desiredMoveDirection = transform.right * moveLeftRight + transform.forward * moveForwardBackward;
 
+		// Normalize the movement vector if its magnitude > 1 to prevent faster diagonal movement
+		if (desiredMoveDirection.magnitude > 1f)
+			desiredMoveDirection.Normalize();
 
+		// Smoothing movement
+		physics.moveDirection = Vector3.Lerp(physics.moveDirection, desiredMoveDirection, movement.walkSpeed * Time.deltaTime);
 	}
+
 
 	void Jump()
 	{
@@ -187,17 +187,49 @@ public class PlayerController : MonoBehaviour
 
 	void HandleMovementType()
 	{
-		if (Input.GetKeyDown(KeyCode.C) && physics.isGrounded)
+		// Movement type should be changed to something like this:
+		// Walking
+		// Swimming
+		// Driving
+
+		// From each of these can have their own sub-types such as:
+		// Walking {Walking, Running, Falling, Climbing, ect}
+
+		// Crouch
+		if (movement.type != Movement.MovementType.Climbing)
 		{
-			
-			if (movement.type == Movement.MovementType.Crouching)
+			if (movement.type != Movement.MovementType.Swimming)
+			{
+				if (Input.GetButtonDown("Crouch"))
+				{
+					if (movement.type == Movement.MovementType.Crouching)
+					{
+						movement.type = Movement.MovementType.Walking;
+					}
+					else
+					{
+						movement.type = Movement.MovementType.Crouching;
+					}
+				}
+			}
+		}
+
+		// Run
+		if (Input.GetButtonDown("Sprint"))
+		{
+			if (movement.type != Movement.MovementType.Climbing)
+			{
+				if (movement.type != Movement.MovementType.Swimming)
+				{
+					movement.type = Movement.MovementType.Running;
+				}
+			}
+		}
+		else
+		{
+			if (movement.type == Movement.MovementType.Running)
 			{
 				movement.type = Movement.MovementType.Walking;
-			}
-			else
-			{
-				movement.type = Movement.MovementType.Crouching;
-
 			}
 		}
 	}
@@ -222,40 +254,82 @@ public class PlayerController : MonoBehaviour
 		Gizmos.DrawLine(physics.rayOrigin, physics.rayOrigin + (Vector3.down * physics.rayDistance));
 	}
 
-
 	void ApplyPlayerModel(int index)
 	{
-		Transform boneRoot = animations.rootBone;
-
 		// Remove old model
 		for (int i = 0; i < models.modelTransform.childCount; i++)
 		{
 			var child = models.modelTransform.GetChild(i);
-			if (child != boneRoot)
-			{
-				Destroy(child);
-			}
+
+			//if (child != boneRoot)
+			//{
+			//	Destroy(child.gameObject);
+			//}
+
+			Destroy(child.gameObject);
 		}
 
-		GameObject[] meshes = models.playerModels[index].skinnedGameObjects;
-
-		// Add new model
-		for (int i = 0; i < meshes.Length; i++)
+		GameObject playerModel = Instantiate(models.playerModels[index].prefab, models.modelTransform);
+		Animator animator = playerModel.GetComponent<Animator>();
+		if (!animator)
 		{
-			GameObject newModel = Instantiate(meshes[i], models.modelTransform);
-			SkinnedMeshRenderer renderer = newModel.GetComponent<SkinnedMeshRenderer>();
-			renderer.rootBone = boneRoot;
-
-			// Handle animator
-			Animator newModelAnimator = newModel.GetComponent<Animator>();
-			if (newModelAnimator)
-			{
-				animations.animator.runtimeAnimatorController = newModelAnimator.runtimeAnimatorController;
-				animations.animator.avatar = newModelAnimator.avatar;
-			}
+			playerModel.AddComponent(typeof(Animator));
+			animator = playerModel.GetComponent<Animator>();
 		}
+
+		animator.runtimeAnimatorController = animations.animationController;
+		animator.avatar = animations.avatar;
+		animations.animator = animator;
+
+		//// Add new model
+		//for (int i = 0; i < meshes.Length; i++)
+		//{
+		//	GameObject newModel = Instantiate(meshes[i], models.modelTransform);
+		//	SkinnedMeshRenderer renderer = newModel.GetComponent<SkinnedMeshRenderer>();
+		//	renderer.rootBone = boneRoot;
+
+		//	// Handle animator
+		//	Animator newModelAnimator = newModel.GetComponent<Animator>();
+		//	if (newModelAnimator)
+		//	{
+		//		animations.animator.runtimeAnimatorController = newModelAnimator.runtimeAnimatorController;
+		//		animations.animator.avatar = newModelAnimator.avatar;
+		//	}
+		//}
 	}
 
+	void ApplyAnimationClips()
+	{
+		AnimatorOverrideController aoc = animations.animator.runtimeAnimatorController as AnimatorOverrideController;
+
+		if (aoc != null)
+		{
+			// Jogging
+			aoc["Idle"] = animations.animationClips.idling.idle;
+			aoc["Jog Forward"] = animations.animationClips.walking.forward;
+			aoc["Jog Backward"] = animations.animationClips.walking.backward;
+			aoc["Jog Strafe Left"] = animations.animationClips.walking.left;
+			aoc["Jog Strafe Right"] = animations.animationClips.walking.right;
+
+			// Running
+			aoc["Run"] = animations.animationClips.running.forward;
+			aoc["Left Strafe"] = animations.animationClips.running.left;
+			aoc["Right Strafe"] = animations.animationClips.running.right;
+
+			// Crouching
+			aoc["Crouch Idle"] = animations.animationClips.idling.crouchIdle;
+			aoc["Crouched Walking"] = animations.animationClips.crouching.forward;
+			aoc["Crouched Walking Backwards"] = animations.animationClips.crouching.backward;
+			aoc["Crouched Sneaking Left"] = animations.animationClips.crouching.left;
+			aoc["Crouched Sneaking Right"] = animations.animationClips.crouching.left;
+
+			// Climbing
+
+			// Swimming
+
+		}
+
+	}
 
 	void UpdateAnimationValues()
 	{
@@ -289,7 +363,7 @@ public class PlayerController : MonoBehaviour
 		#endregion
 
 		internal float jumpHeightConversion = 4f;
-		internal enum MovementType { Walking = 0, Running = 1, Crouching = 2, Climbing = 3, Swimming = 4}
+		internal enum MovementType { Walking = 0, Running = 1, Crouching = 2, Climbing = 3, Swimming = 4 }
 		internal MovementType type = MovementType.Walking;
 	}
 
@@ -324,6 +398,10 @@ public class PlayerController : MonoBehaviour
 		internal Animator animator;
 		[SerializeField]
 		internal Transform rootBone;
+		[SerializeField]
+		internal RuntimeAnimatorController animationController;
+		[SerializeField]
+		internal Avatar avatar;
 		[Space, SerializeField]
 		internal Clips animationClips;
 		#endregion
@@ -467,14 +545,11 @@ public class PlayerController : MonoBehaviour
 		{
 			get
 			{
-				// The ray will be cast from slightly above the bottom of the player to just below the bottom of the player
-				rayOrigin = playerTransform.position + (Vector3.up * 0.05f);
-				rayDistance = rayOrigin.y + groundCheckDistance;
-				
-				// Perform the raycast
-				return UnityEngine.Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, groundMask);
+				Vector3 sphereStart = playerTransform.position + (Vector3.up * 0.05f);
+				return UnityEngine.Physics.CheckSphere(sphereStart, groundCheckDistance, groundMask);
 			}
 		}
+
 
 		internal float xRotation = 0f;
 	}

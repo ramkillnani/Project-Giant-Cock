@@ -279,6 +279,7 @@ public class PlayerController : MonoBehaviour
 
 		animator.runtimeAnimatorController = animations.animationController;
 		animator.avatar = animations.avatar;
+		animator.applyRootMotion = false;
 		animations.animator = animator;
 
 		//// Add new model

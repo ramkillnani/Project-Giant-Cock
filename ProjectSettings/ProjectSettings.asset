@@ -774,7 +774,21 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: ENVIRO_LW
+    CloudRendering: ENVIRO_LW
+    EmbeddedLinux: ENVIRO_LW
+    GameCoreXboxOne: ENVIRO_LW
+    Lumin: ENVIRO_LW
+    Nintendo Switch: ENVIRO_LW
+    PS4: ENVIRO_LW
+    PS5: ENVIRO_LW
+    Stadia: ENVIRO_LW
+    Standalone: ENVIRO_LW
+    WebGL: ENVIRO_LW
+    Windows Store Apps: ENVIRO_LW
+    XboxOne: ENVIRO_LW
+    tvOS: ENVIRO_LW
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

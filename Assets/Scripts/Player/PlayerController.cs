@@ -4,6 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.InputSystem;
+using Unity.VisualScripting;
+using UnityEngine.UIElements.Experimental;
+using System.Web.Mvc;
 
 // TODO: Add LocalPlayer, AiPlayer and NetworkedPlayer classes
 
@@ -48,12 +52,27 @@ namespace Player
 			{
 				localPlayer = this;
 			}
+			Init();
+		}
+
+		private void OnEnable()
+		{
+			controls.OnEnable();
+		}
+
+		private void OnDisable()
+		{
+			controls.OnDisable();
 		}
 
 		void Init()
 		{
+			controls.Awake(this);
+		}
+
+		void LateInit()
+		{
 			animations.Start(this);
-			controls.Start(this);
 			inventory.Start(this);
 			look.Start(this);
 			models.Start(this);
@@ -67,7 +86,7 @@ namespace Player
 
 		private void Start()
 		{
-			Init();
+			LateInit();
 
 			if (physics.playerBody == null)
 			{
@@ -83,12 +102,13 @@ namespace Player
 			ApplyPlayerModel(models.selectedPlayerIndex);
 
 			// Apply animations
-			ApplyAnimationClips();
+			//ApplyAnimationClips();
+
+			// Start retrieving animation values
+			StartCoroutine(UpdateAnimationVariables());
 
 			// Setup Cinemachine
 			SetupCamera();
-
-			
 		}
 
 		private void Update()
@@ -99,7 +119,6 @@ namespace Player
 			CameraBobbing();
 			HandleMovementType();
 			CheckSubmersion();
-			UpdateAnimationValues();
 
 			// Apply a new player model manually
 			if (models.applyModel)
@@ -145,21 +164,14 @@ namespace Player
 			physics.playerBody.MovePosition(physics.playerBody.position + move);
 		}
 
-
 		void Rotate()
 		{
 			// Handle player rotation
-			float mouseX = Input.GetAxis("Mouse X") * look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
-			float mouseY = Input.GetAxis("Mouse Y") * look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
+			float mouseX = controls.HorizontalLook * look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
+			float mouseY = controls.VerticalLook * look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
 
 			physics.xRotation -= mouseY;
 			physics.xRotation = Mathf.Clamp(physics.xRotation, -90f, 90f);
-
-			//Camera camera = look.camera;
-			//if (camera != null)
-			//{
-			//	camera.transform.localRotation = Quaternion.Euler(physics.xRotation, 0f, 0f);
-			//}
 
 			Transform go = look.cameraPivot;
 			if (go != null)
@@ -172,8 +184,8 @@ namespace Player
 
 		void Move()
 		{
-			float moveForwardBackward = Input.GetAxis("Vertical");
-			float moveLeftRight = Input.GetAxis("Horizontal");
+			float moveForwardBackward = controls.VerticalMove;
+			float moveLeftRight = controls.HorizontalMove;
 
 			Vector3 desiredMoveDirection = transform.right * moveLeftRight + transform.forward * moveForwardBackward;
 
@@ -182,25 +194,23 @@ namespace Player
 				desiredMoveDirection.Normalize();
 
 			// Smoothing movement
-			physics.moveDirection = Vector3.Lerp(physics.moveDirection, desiredMoveDirection, movement.walkSpeed * Time.deltaTime);
+			physics.moveDirection = Vector3.Lerp(physics.moveDirection, desiredMoveDirection, movement.smoothing * Time.deltaTime);
 		}
-
 
 		void Jump()
 		{
 			// Handle jumping
-			if (Input.GetButtonDown("Jump") && physics.isGrounded)
+			if (controls.Jump && physics.isGrounded)
 			{
 				physics.playerBody.velocity = new Vector3(physics.playerBody.velocity.x, movement.jumpHeight * movement.jumpHeightConversion, physics.playerBody.velocity.z);
 			}
-			physics.drawGizmos = true;
 		}
 
 		void CameraBobbing()
 		{
 			if (animations.cameraBob)
 			{
-				if ((Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0) && physics.isGrounded)
+				if (physics.isMoving && physics.isGrounded)
 				{
 					look.cinemachineBob.m_FrequencyGain = look.bobFrequency;
 					look.cinemachineBob.m_AmplitudeGain = Mathf.Lerp(look.cinemachineBob.m_AmplitudeGain, look.bobAmplitude, Time.deltaTime * look.cameraSmoothing);
@@ -212,54 +222,25 @@ namespace Player
 			}
 		}
 
-
 		void HandleMovementType()
 		{
-			// Movement type should be changed to something like this:
-			// Walking
-			// Swimming
-			// Driving
+			// If the player is in the air, don't change the movement type
+			if (!physics.isGrounded) return;
 
-			// From each of these can have their own sub-types such as:
-			// Walking {Walking, Running, Falling, Climbing, ect}
-
-			// Crouch
-			if (movement.type != Movement.MovementType.Climbing)
+			if (controls.Crouch)
 			{
-				if (movement.type != Movement.MovementType.Swimming)
-				{
-					if (Input.GetButtonDown("Crouch"))
-					{
-						if (movement.type == Movement.MovementType.Crouching)
-						{
-							movement.type = Movement.MovementType.Walking;
-						}
-						else
-						{
-							movement.type = Movement.MovementType.Crouching;
-						}
-					}
-				}
+				movement.type = Movement.MovementType.Crouching;
 			}
-
-			// Run
-			if (Input.GetButtonDown("Sprint"))
+			else if (controls.Run && (controls.VerticalMove > 0 || controls.HorizontalMove != 0))
 			{
-				if (movement.type != Movement.MovementType.Climbing)
-				{
-					if (movement.type != Movement.MovementType.Swimming)
-					{
-						movement.type = Movement.MovementType.Running;
-					}
-				}
+				movement.type = Movement.MovementType.Running;
 			}
 			else
 			{
-				if (movement.type == Movement.MovementType.Running)
-				{
-					movement.type = Movement.MovementType.Walking;
-				}
+				movement.type = Movement.MovementType.Walking;
 			}
+
+			// TODO: Implement conditions for Climbing and Swimming when those mechanics are added
 		}
 
 		void CheckSubmersion()
@@ -285,16 +266,19 @@ namespace Player
 		void ApplyPlayerModel(int index)
 		{
 			// Remove old model
-			for (int i = 0; i < models.modelTransform.childCount; i++)
+			if (models.modelTransform.childCount > 0)
 			{
-				var child = models.modelTransform.GetChild(i);
+				for (int i = 0; i < models.modelTransform.childCount; i++)
+				{
+					var child = models.modelTransform.GetChild(i);
 
-				//if (child != boneRoot)
-				//{
-				//	Destroy(child.gameObject);
-				//}
+					//if (child != boneRoot)
+					//{
+					//	Destroy(child.gameObject);
+					//}
 
-				Destroy(child.gameObject);
+					Destroy(child.gameObject);
+				}
 			}
 
 			GameObject playerModel = Instantiate(models.playerModels[index].prefab, models.modelTransform);
@@ -305,16 +289,17 @@ namespace Player
 				animator = playerModel.GetComponent<Animator>();
 			}
 
+			// This works correctly. It is becoming null after this gets called, likely in ApplyAnimationClips
 			animator.runtimeAnimatorController = animations.animationController;
 			animator.avatar = animations.avatar;
-			animator.applyRootMotion = false;
+			animator.applyRootMotion = true;
 			animations.animator = animator;
 		}
 
 		void ApplyAnimationClips()
 		{
 			AnimatorOverrideController aoc = animations.animator.runtimeAnimatorController as AnimatorOverrideController;
-
+			Debug.Log(aoc.name + "Override controller created.");
 			if (aoc != null)
 			{
 				// Idle
@@ -343,15 +328,49 @@ namespace Player
 				// Swimming
 
 			}
-
+			Debug.Log("Applying override controller...");
+			animations.animator.runtimeAnimatorController = aoc;
+			if (animations.animator.runtimeAnimatorController == aoc)
+			{
+				Debug.Log(animations.animator.runtimeAnimatorController.name + "override applied successfully!");
+			}
 		}
 
-		void UpdateAnimationValues()
+		// Due to the nature of using "get" for the movement variables,
+		// calling these variables multiple times can cause a performance drop.
+		// Due to this, I have implemented an animation update rate to call
+		// these variables less
+		IEnumerator UpdateAnimationVariables()
 		{
-			animations.animator.SetFloat("Horizontal", Input.GetAxis("Horizontal"));
-			animations.animator.SetFloat("Vertical", Input.GetAxis("Vertical"));
-			animations.animator.SetInteger("Movement Type", (int)movement.type);
+			while (true)
+			{
+				if (animations.animator != null)
+				{
+					UpdateAnimationValues();
+				}
+				else
+				{
+					Debug.Log("Player animator is null!");
+				}
+				yield return new WaitForSeconds(1 / settings.performance.animationVariableUpdateRate);
+			}
+		}
 
+		private void UpdateAnimationValues()
+		{
+			animations.animator.SetInteger("Movement Type", (int)movement.type);
+			animations.animator.SetFloat("Horizontal", controls.HorizontalMove);
+			animations.animator.SetFloat("Vertical", controls.VerticalMove);
+			animations.animator.SetBool("isGrounded", physics.isGrounded);
+			animations.animator.SetBool("isMoving", physics.isMoving);
+			// Using "jumpReset" instead of "Jump" to check if jump was pressed between the frames
+			// that this method was not called in (because this method is running at a different
+			// frame rate set in settings.performace)
+			if (controls.jumpReset)
+			{
+				controls.jumpReset = false;
+				animations.animator.SetTrigger("Jump");
+			}
 		}
 	}
 
@@ -384,14 +403,13 @@ namespace Player
 	public class Animations
 	{
 		private PlayerController controller;
+		internal Animator animator;
 
 		#region Inspector Variables
 		public bool cameraBob = true;
 		[Tooltip("Uses IK to allow the player's animation to dynamically change it's animation based off of the environment \n" +
 			" (will prevent holding items clipping walls and feet clipping ground).")]
 		public bool reactToEnvironment = true;
-		[SerializeField]
-		internal Animator animator;
 		[SerializeField]
 		internal RuntimeAnimatorController animationController;
 		[SerializeField]
@@ -488,21 +506,6 @@ namespace Player
 		internal void Start(PlayerController controller)
 		{
 			this.controller = controller;
-			controller.StartCoroutine(UpdateAnimationValues());
-		}
-
-		IEnumerator UpdateAnimationValues()
-		{
-			animator.SetBool("isMoving", controller.physics.isMoving);
-			float fr = 1 / controller.settings.performance.animationVariableUpdateRate;
-			if (Time.deltaTime > fr)
-			{
-				yield return new WaitForSeconds(Time.deltaTime);
-			}
-			else
-			{
-				yield return new WaitForSeconds(1 / controller.settings.performance.animationVariableUpdateRate);
-			}
 		}
 	}
 
@@ -511,37 +514,243 @@ namespace Player
 	{
 		private PlayerController controller;
 
-		#region Inspector Variables
-		[SerializeField]
-		internal float axisDeadZone = 0.005f;
-		#endregion
+		public float HorizontalMove
+		{
+			get
+			{
+#if ENABLE_INPUT_SYSTEM
+				return movementAction.ReadValue<Vector2>().x;
+#else
+				return Input.GetAxis("Horizontal");
+#endif
+			}
+		}
 
-		internal void Start(PlayerController controller)
+		public float VerticalMove
+		{
+			get
+			{
+#if ENABLE_INPUT_SYSTEM
+				return movementAction.ReadValue<Vector2>().y;
+#else
+				return Input.GetAxis("Vertical");
+#endif
+			}
+		}
+
+		public bool jumpReset;
+
+		public bool Jump
+		{
+			get
+			{
+
+#if ENABLE_INPUT_SYSTEM
+				if (jumpAction.triggered)
+				{
+					jumpReset = true;
+				}
+				return jumpAction.triggered;
+#else
+				if (Input.GetButtonDown("Jump"))
+				{
+					jumpReset = true;
+				}
+				return Input.GetButtonDown("Jump");
+#endif
+			}
+		}
+
+		private bool triggerRun = false;
+
+		public bool Run
+		{
+			get
+			{
+				if (!runTrigger)
+				{
+#if ENABLE_INPUT_SYSTEM
+
+					return sprintAction.ReadValue<float>() > holdThreshold;
+#else
+					return Input.GetButton("Sprint");
+#endif
+				}
+				else
+				{
+#if ENABLE_INPUT_SYSTEM
+					if (sprintAction.triggered)
+					{
+						triggerRun = !triggerRun;
+						triggerCrouch = !triggerRun;
+					}
+
+#else
+					if (Input.GetButtonDown("Sprint"))
+					{
+						triggerRun = !triggerRun;
+					}
+#endif
+					return triggerRun;
+				}
+			}
+		}
+
+		private bool triggerCrouch = false;
+		public bool Crouch
+		{
+			get
+			{
+				if (!crouchTrigger)
+				{
+#if ENABLE_INPUT_SYSTEM
+
+					return crouchAction.ReadValue<float>() > holdThreshold;
+#else
+					return Input.GetButton("Crouch");
+#endif
+				}
+				else
+				{
+#if ENABLE_INPUT_SYSTEM
+					if (crouchAction.triggered)
+					{
+						triggerCrouch = !triggerCrouch;
+						triggerRun = !triggerCrouch;
+					}
+
+#else
+					if (Input.GetButtonDown("Crouch"))
+					{
+						triggerCrouch = !triggerCrouch;
+						triggerRun = !triggerCrouch;
+					}
+#endif
+					return triggerCrouch;
+				}
+			}
+		}
+
+		public float HorizontalLook
+		{
+			get
+			{
+#if ENABLE_INPUT_SYSTEM
+				return mouseAction.ReadValue<Vector2>().x;
+#else
+				return Input.GetAxis("Mouse X")
+#endif
+			}
+		}
+
+		public float VerticalLook
+		{
+			get
+			{
+#if ENABLE_INPUT_SYSTEM
+				return mouseAction.ReadValue<Vector2>().y;
+#else
+				return Input.GetAxis("Mouse Y")
+#endif
+			}
+		}
+
+		public bool Interact
+		{
+			get
+			{
+#if ENABLE_INPUT_SYSTEM
+				return interactAction.triggered;
+#else
+				return Input.GetButtonDown("Interact");
+#endif
+			}
+		}
+
+		// Avoid using this on items as the "Use" event will trigger item methods
+		public bool Use
+		{
+			get
+			{
+#if ENABLE_INPUT_SYSTEM
+
+				return useAction.ReadValue<float>() > holdThreshold;
+#else
+				return Input.GetButton("Fire");
+#endif
+			}
+		}
+
+		// Avoid using this on items as the "Aim" event will trigger item methods
+		public bool Aim
+		{
+			get
+			{
+#if ENABLE_INPUT_SYSTEM
+
+				return aimAction.ReadValue<float>() > holdThreshold;
+#else
+				return Input.GetButton("Aim");
+#endif
+			}
+		}
+
+		public PlayerInput input { get; private set; }
+
+		private InputAction movementAction;
+		private InputAction mouseAction;
+
+		private InputAction sprintAction;
+		private InputAction crouchAction;
+
+		private InputAction jumpAction;
+		private InputAction interactAction;
+		private InputAction useAction; // Use items (shoot, turn torch light on/off, ect)
+		private InputAction aimAction; // Use items secondary (aim, change torch colour, ect)
+
+#region Editor Variables
+		[SerializeField]
+		internal float holdThreshold = 0.4f;
+		[SerializeField, Tooltip("Whether run needs to be held to stay running.")]
+		internal bool runTrigger = false;
+		[SerializeField, Tooltip("Whether crouch needs to be held to stay running.")]
+		internal bool crouchTrigger = true;
+#endregion
+
+		internal void OnEnable()
+		{
+
+		}
+
+		internal void OnDisable()
+		{
+
+		}
+
+		internal void Awake(PlayerController controller)
 		{
 			this.controller = controller;
+
+			InitControls();
+
 		}
 
-		internal Vector2 input
+		private void InitControls()
 		{
-			get
-			{
-				float x = Input.GetAxis("Horizontal");
-				float y = Input.GetAxis("Vertical");
+#if ENABLE_INPUT_SYSTEM
+			input = controller.GetComponent<PlayerInput>();
 
-				return new Vector2(x, y);
-			}
+			// Capture input actions
+			movementAction = input.actions["Move"];
+			mouseAction = input.actions["Look"];
+			sprintAction = input.actions["Run"];
+			jumpAction = input.actions["Jump"];
+			crouchAction = input.actions["Crouch"];
+			interactAction = input.actions["Interact"];
+			useAction = input.actions["Use"];
+#endif
 		}
 
-		internal Vector2 mouse
-		{
-			get
-			{
-				float x = Input.GetAxis("Mouse X") * controller.look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
-				float y = Input.GetAxis("Mouse Y") * controller.look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
-
-				return new Vector2(x, y);
-			}
-		}
 	}
 
 	[Serializable]
@@ -560,7 +769,7 @@ namespace Player
 	{
 		private PlayerController controller;
 
-		#region Inspector Variables
+#region Inspector Variables
 		[SerializeField]
 		public CinemachineVirtualCamera cinemachineCamera;
 		[SerializeField]
@@ -577,7 +786,7 @@ namespace Player
 
 		[SerializeField]
 		internal ParticleSystem cameraEffects;
-		#endregion
+#endregion
 
 		internal CinemachineBasicMultiChannelPerlin cinemachineBob;
 
@@ -600,7 +809,7 @@ namespace Player
 			this.controller = controller;
 		}
 
-		#region Inspector Variables
+#region Inspector Variables
 		[SerializeField]
 		internal int selectedPlayerIndex = 0;
 		[SerializeField]
@@ -609,7 +818,7 @@ namespace Player
 		internal bool applyModel = false;
 		[SerializeField, Space]
 		internal Transform modelTransform;
-		#endregion
+#endregion
 	}
 
 	[Serializable]
@@ -617,7 +826,7 @@ namespace Player
 	{
 		private PlayerController controller;
 
-		#region Inspector Variables
+#region Inspector Variables
 		[SerializeField]
 		internal float crouchSpeed = 2;
 		[SerializeField]
@@ -631,10 +840,14 @@ namespace Player
 		[SerializeField]
 		internal float swimSpeed = 2;
 
+		// Fake friction. Can use to simulate friction, however this smoothes the input axis rather than rigidbody itself.
+		[SerializeField]
+		internal float smoothing = 10;
+
 		// Slows the player down if player is in water
 		[SerializeField]
 		internal float submergedSpeedMultiplier = 0.5f;
-		#endregion
+#endregion
 
 		internal float jumpHeightConversion = 4f;
 		internal enum MovementType { Walking = 0, Running = 1, Crouching = 2, Climbing = 3, Swimming = 4 }
@@ -657,7 +870,7 @@ namespace Player
 	{
 		private PlayerController controller;
 
-		#region Inspector Variables
+#region Inspector Variables
 		[SerializeField]
 		internal float groundCheckDistance = 0.1f;
 		[SerializeField]
@@ -669,32 +882,13 @@ namespace Player
 		internal LayerMask groundMask;
 		[SerializeField]
 		internal Transform submergePoint;
-		#endregion
+#endregion
 
-		// Check rigidbody velocity in case outside factor's is moving character
 		public bool isMoving
 		{
 			get
 			{
-				Debug.Log("Player velocity: " + playerBody.velocity.sqrMagnitude);
-				if (playerBody.velocity.sqrMagnitude > 0.05f)
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-
-				// If player is moved by input
-				//if (input.x > axisDeadZone || input.x < -axisDeadZone || input.y > axisDeadZone || input.y < -axisDeadZone)
-				//{
-				//	return true;
-				//}
-				//else
-				//{
-				//	return false;
-				//}
+				return controller.controls.VerticalMove != 0 || controller.controls.HorizontalMove != 0;
 			}
 		}
 
@@ -714,7 +908,6 @@ namespace Player
 				return UnityEngine.Physics.CheckSphere(sphereStart, groundCheckDistance, groundMask);
 			}
 		}
-
 
 		internal float xRotation = 0f;
 
@@ -756,7 +949,7 @@ namespace Player
 	{
 		private PlayerController controller;
 
-		#region Inspector Variables
+#region Inspector Variables
 		[SerializeField]
 		internal AudioClip[] footstepsGrass;
 		[SerializeField]
@@ -769,7 +962,7 @@ namespace Player
 		internal AudioClip[] footstepsGravel;
 
 		public AudioSource audio;
-		#endregion
+#endregion
 
 		internal void Start(PlayerController controller)
 		{
@@ -798,5 +991,5 @@ namespace Player
 			this.controller = controller;
 		}
 	}
-	#endregion
+#endregion
 }

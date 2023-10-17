@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "New Item", menuName = "Items/Create Player Item", order = 1)]
 public class Item : ScriptableObject
 {
 	#region Inspector Values
@@ -12,6 +13,8 @@ public class Item : ScriptableObject
     private string _id;
     [SerializeField]
     private GameObject _gameObject;
+    [SerializeField]
+    private string[] usageButtons;
 	#endregion
 
 	#region Code variables
@@ -19,6 +22,7 @@ public class Item : ScriptableObject
     {
         get
         {
+            name = _name;
             return _name;
         }
     }
@@ -66,7 +70,7 @@ public class Item : ScriptableObject
         
     }
 
-    // Use is called when the player triggers fire while this item is equipped and can be used
+    // Use is called when the one of the usage buttons has been triggered
     protected virtual void Use()
     {
 

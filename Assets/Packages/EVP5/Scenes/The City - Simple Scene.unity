@@ -43,7 +43,7 @@ RenderSettings:
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 11
+  serializedVersion: 12
   m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_LightingSettings: {fileID: 1605862171}
 --- !u!196 &5
 NavMeshSettings:
   serializedVersion: 2
@@ -118,6 +118,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
@@ -128,6 +130,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 477086, guid: 0e18cad7a11c0e0499a23c6252c4b6d9, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 477086, guid: 0e18cad7a11c0e0499a23c6252c4b6d9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -141,6 +147,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 477086, guid: 0e18cad7a11c0e0499a23c6252c4b6d9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 477086, guid: 0e18cad7a11c0e0499a23c6252c4b6d9, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -152,14 +162,6 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 477086, guid: 0e18cad7a11c0e0499a23c6252c4b6d9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 477086, guid: 0e18cad7a11c0e0499a23c6252c4b6d9, type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e18cad7a11c0e0499a23c6252c4b6d9, type: 3}
 --- !u!1001 &406042667
@@ -169,6 +171,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 475578, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 475578, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 105.008003
@@ -182,6 +188,10 @@ PrefabInstance:
       value: -154.059998
       objectReference: {fileID: 0}
     - target: {fileID: 475578, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 475578, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -193,14 +203,6 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 475578, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 475578, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
-      propertyPath: m_RootOrder
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 11444718, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
       propertyPath: target
       value: 
@@ -210,12 +212,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 11444718, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
-      propertyPath: smoothFollowSettings.distance
-      value: 7.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 11444718, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
       propertyPath: smoothFollowSettings.height
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444718, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
+      propertyPath: smoothFollowSettings.distance
+      value: 7.5
       objectReference: {fileID: 0}
     - target: {fileID: 11444718, guid: 4fd8c3dffdf3994438b4458645330a0b, type: 3}
       propertyPath: smoothFollowSettings.heightDamping
@@ -231,16 +233,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 424522, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 424522, guid: 2ebf004673b6248418228e201e70d683, type: 3}
       propertyPath: m_LocalPosition.x
       value: 112.119225
       objectReference: {fileID: 0}
     - target: {fileID: 424522, guid: 2ebf004673b6248418228e201e70d683, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.64032793
+      value: 1.6403279
       objectReference: {fileID: 0}
     - target: {fileID: 424522, guid: 2ebf004673b6248418228e201e70d683, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -147.916077
+      value: -147.91608
+      objectReference: {fileID: 0}
+    - target: {fileID: 424522, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 424522, guid: 2ebf004673b6248418228e201e70d683, type: 3}
       propertyPath: m_LocalRotation.x
@@ -254,17 +264,441 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 424522, guid: 2ebf004673b6248418228e201e70d683, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 424522, guid: 2ebf004673b6248418228e201e70d683, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 11434010, guid: 2ebf004673b6248418228e201e70d683, type: 3}
       propertyPath: wheelPositionMode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.ctrl.m_Id
+      value: 7a5eba71-6961-4f17-b239-4e73f572e723
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.ctrl.m_Name
+      value: Ctrl
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.brakeAxis.m_Id
+      value: 9819f817-c200-44f1-8a2e-6331e4b2bfee
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_Id
+      value: 2db06505-2f79-4984-9d05-c9b5219677bd
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.brakeAxis.m_Name
+      value: Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.brakeButton.m_Id
+      value: 46a6c47a-75b8-40a4-ae78-0bd37c4ca3b8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_Name
+      value: Steer Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_Id
+      value: 41dc700c-c6e2-43b5-a91d-47febbaf3618
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.brakeButton.m_Name
+      value: Brake Button
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.handbrakeAxis.m_Id
+      value: 090b589c-b07c-4544-901c-96fee0cc8393
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_Name
+      value: Throttle Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleButton.m_Id
+      value: 24210d83-1a02-44b6-b528-4f3a29a38115
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.handbrakeAxis.m_Name
+      value: Handbrake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.resetVehicleKey.m_Id
+      value: 553e0f5c-d570-4569-8e59-250f74820421
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleButton.m_Name
+      value: Throttle Button
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.resetVehicleKey.m_Name
+      value: Reset Vehicle Key
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.resetVehicleButton.m_Id
+      value: 01ec025d-618e-4ccc-9e7d-0d5a6fddfdaa
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.resetVehicleButton.m_Name
+      value: Reset Vehicle Button
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_Id
+      value: 51fe6dcb-6e42-4269-8bf5-4196e454b44b
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_Name
+      value: Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_Id
+      value: 76301126-0fda-469c-a50b-1fba402b3e9a
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_Name
+      value: Steer Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.ctrl.m_SingletonActionBindings.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.brakeAxis.m_SingletonActionBindings.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.ctrl.m_SingletonActionBindings.Array.data[0].m_Id
+      value: 7c58ef29-4254-4932-ab44-e6e8a8cfeb9f
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.handbrakeAxis.m_SingletonActionBindings.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.ctrl.m_SingletonActionBindings.Array.data[0].m_Path
+      value: <Keyboard>/ctrl
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.resetVehicleKey.m_SingletonActionBindings.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.ctrl.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Ctrl
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.brakeAxis.m_SingletonActionBindings.Array.data[0].m_Id
+      value: aaaed135-2634-4652-a37b-d269f67a5be5
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[0].m_Id
+      value: 7e19a0cc-9cdb-47cd-82a8-cd8c9acd0728
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[1].m_Id
+      value: 5f116112-6658-4bd4-babf-87444c5f1268
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[2].m_Id
+      value: a6dd2e71-b055-49ab-a22c-84d541a256f5
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.brakeAxis.m_SingletonActionBindings.Array.data[0].m_Path
+      value: <Keyboard>/s
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[0].m_Name
+      value: 1D Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[0].m_Path
+      value: 1DAxis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[1].m_Name
+      value: negative
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[1].m_Path
+      value: <Keyboard>/a
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[2].m_Name
+      value: positive
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[2].m_Path
+      value: <Keyboard>/d
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[0].m_Flags
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[1].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[2].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[0].m_Id
+      value: cd6353de-a209-4d4a-8fce-3d860975b52f
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[1].m_Id
+      value: 6848bb0b-ec03-42ac-94b1-7d0d8b567f34
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[2].m_Id
+      value: 21e79fce-4f43-4404-8356-f8a2407e32a6
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.brakeAxis.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.handbrakeAxis.m_SingletonActionBindings.Array.data[0].m_Id
+      value: 8cc4ec36-e92e-404e-8fdf-3e24d5330573
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.handbrakeAxis.m_SingletonActionBindings.Array.data[1].m_Id
+      value: ddb08c74-2214-4a9e-9075-317135249619
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Steer Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[1].m_Action
+      value: Steer Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerAxis.m_SingletonActionBindings.Array.data[2].m_Action
+      value: Steer Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[0].m_Name
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[0].m_Path
+      value: <Keyboard>/w
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[1].m_Name
+      value: negative
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[2].m_Name
+      value: positive
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.handbrakeAxis.m_SingletonActionBindings.Array.data[0].m_Path
+      value: <Keyboard>/space
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.resetVehicleKey.m_SingletonActionBindings.Array.data[0].m_Id
+      value: a5bf7e22-0fae-4fc6-92fe-9aaa408826c6
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[0].m_Flags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[1].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[2].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Throttle Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[1].m_Action
+      value: Throttle Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAxis.m_SingletonActionBindings.Array.data[2].m_Action
+      value: Throttle Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.handbrakeAxis.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Handbrake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.handbrakeAxis.m_SingletonActionBindings.Array.data[1].m_Action
+      value: Handbrake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.resetVehicleKey.m_SingletonActionBindings.Array.data[0].m_Path
+      value: <Keyboard>/r
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.resetVehicleKey.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Reset Vehicle Key
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Id
+      value: 582a03ef-5f3b-4970-af26-c727e69b7f3b
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Id
+      value: b2a9c5a5-fdc2-468d-a5a9-4b77d4c5612f
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Id
+      value: 6fb72ffb-7f06-4beb-ad1d-72432f0ccd2c
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Name
+      value: 1D Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Path
+      value: 1DAxis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Name
+      value: negative
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Path
+      value: <Keyboard>/s
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Name
+      value: positive
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Path
+      value: <Keyboard>/w
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Flags
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Action
+      value: Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.throttleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Action
+      value: Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Id
+      value: 1d45aa2a-f49d-43ae-9f28-426284e1e7b5
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Id
+      value: 204a2b8a-ed6a-4630-a13d-8e6c12bfba8b
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Id
+      value: 3006063b-a642-4aa5-b383-b31e5af8850a
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[3].m_Id
+      value: d7fbdee6-f84d-4edc-924b-ff8d9554afa4
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[4].m_Id
+      value: c3f20995-02fa-46c7-9a07-c8ffb831ae52
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Name
+      value: 2D Vector
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Path
+      value: 2DVector
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Name
+      value: up
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Name
+      value: down
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[3].m_Name
+      value: left
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[4].m_Name
+      value: right
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Flags
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[3].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[4].m_Flags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[0].m_Action
+      value: Steer Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[1].m_Action
+      value: Steer Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[2].m_Action
+      value: Steer Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[3].m_Action
+      value: Steer Throttle And Brake Axis
+      objectReference: {fileID: 0}
+    - target: {fileID: 11438042, guid: 2ebf004673b6248418228e201e70d683, type: 3}
+      propertyPath: inputSystem.steerThrottleAndBrakeAxis.m_SingletonActionBindings.Array.data[4].m_Action
+      value: Steer Throttle And Brake Axis
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ebf004673b6248418228e201e70d683, type: 3}
@@ -278,6 +712,7 @@ GameObject:
   m_Component:
   - component: {fileID: 841600621}
   - component: {fileID: 841600620}
+  - component: {fileID: 841600622}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -344,6 +779,7 @@ Light:
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &841600621
@@ -356,10 +792,31 @@ Transform:
   m_LocalRotation: {x: 0.40821794, y: -0.23456973, z: 0.109381676, w: 0.87542605}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &841600622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841600619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 1
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
 --- !u!1001 &1062780783
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -367,6 +824,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 438260, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 438260, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -380,6 +841,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 438260, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 438260, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -391,13 +856,13 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 438260, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
-      propertyPath: m_LocalRotation.w
+    - target: {fileID: 19921162, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
+      propertyPath: m_Materials.Array.size
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 438260, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
-      propertyPath: m_RootOrder
-      value: 3
+    - target: {fileID: 19982122, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5c0f73279994abf41a2b787164368ce4, type: 3}
@@ -443,7 +908,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1566859560}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6faf0f130ea1233468ef719595da630f, type: 3}
   m_Name: 
@@ -465,7 +930,70 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 119.18014, y: 1.3117015, z: -149.2999}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!850595691 &1605862171
+LightingSettings:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Settings.lighting
+  serializedVersion: 4
+  m_GIWorkflowMode: 0
+  m_EnableBakedLightmaps: 0
+  m_EnableRealtimeLightmaps: 0
+  m_RealtimeEnvironmentLighting: 1
+  m_BounceScale: 1
+  m_AlbedoBoost: 1
+  m_IndirectOutputScale: 1
+  m_UsingShadowmask: 0
+  m_BakeBackend: 0
+  m_LightmapMaxSize: 1024
+  m_BakeResolution: 1
+  m_Padding: 2
+  m_LightmapCompression: 3
+  m_AO: 0
+  m_AOMaxDistance: 1
+  m_CompAOExponent: 0
+  m_CompAOExponentDirect: 0
+  m_ExtractAO: 0
+  m_MixedBakeMode: 1
+  m_LightmapsBakeMode: 1
+  m_FilterMode: 1
+  m_LightmapParameters: {fileID: 15204, guid: 0000000000000000f000000000000000, type: 0}
+  m_ExportTrainingData: 0
+  m_TrainingDataDestination: TrainingData
+  m_RealtimeResolution: 0.1
+  m_ForceWhiteAlbedo: 0
+  m_ForceUpdates: 0
+  m_FinalGather: 0
+  m_FinalGatherRayCount: 1024
+  m_FinalGatherFiltering: 1
+  m_PVRCulling: 1
+  m_PVRSampling: 1
+  m_PVRDirectSampleCount: 32
+  m_PVRSampleCount: 500
+  m_PVREnvironmentSampleCount: 500
+  m_PVREnvironmentReferencePointCount: 2048
+  m_LightProbeSampleCountMultiplier: 4
+  m_PVRBounces: 2
+  m_PVRMinBounces: 2
+  m_PVREnvironmentMIS: 0
+  m_PVRFilteringMode: 0
+  m_PVRDenoiserTypeDirect: 0
+  m_PVRDenoiserTypeIndirect: 0
+  m_PVRDenoiserTypeAO: 0
+  m_PVRFilterTypeDirect: 0
+  m_PVRFilterTypeIndirect: 0
+  m_PVRFilterTypeAO: 0
+  m_PVRFilteringGaussRadiusDirect: 1
+  m_PVRFilteringGaussRadiusIndirect: 5
+  m_PVRFilteringGaussRadiusAO: 2
+  m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+  m_PVRFilteringAtrousPositionSigmaIndirect: 2
+  m_PVRFilteringAtrousPositionSigmaAO: 1
+  m_PVRTiledBaking: 0

@@ -5,19 +5,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.InputSystem;
-using Unity.VisualScripting;
-using UnityEngine.UIElements.Experimental;
-using System.Web.Mvc;
+using Items;
+using EVP;
 
-// TODO: Add LocalPlayer, AiPlayer and NetworkedPlayer classes
+// Brackets show this - ("What adding this functionality will do for this script/How important it is to finish")
+// TODO (Functionality/High): cull out character if camera is in first person
+// TODO (Functionality/Medium): Setup item holding for first person
+// TODO (Performance/Low): Create private variables which get set from the serialized variables. This will make it harder to
+// hack, and increase performance. It will also allow us to create scriptable objects for the player variables
+// which will be handy if this player controller is used in future projects.
 
-// Today: Setup item holding for first person, cull out character if camera is in first person
 namespace Player
 {
 	[RequireComponent(typeof(Rigidbody))]
 	public class PlayerController : MonoBehaviour
 	{
 		public static PlayerController localPlayer = null;
+
+		public enum PlayerType { User, AI, Network }
+		public PlayerType playerType = PlayerType.User;
+
+		public enum PlayerState { Movement, Ragdoll, Vehicle, Transitioning }
+		public PlayerState state = PlayerState.Movement;
 
 		#region Assorted variables
 		// Class that holds animation variables related to the player
@@ -40,7 +49,7 @@ namespace Player
 		public Sound sound;
 		// Class that holds variables to control camera & character transitions (such as transitioning from first person to third person, or entering a vehicle ect.)
 		public Transitions transitions;
-		// Placeholder
+		// Placeholder for now
 		public Networking networking;
 		// Class that holds references to GUI elements
 		public UI ui;
@@ -101,24 +110,52 @@ namespace Player
 			// Apply player model
 			ApplyPlayerModel(models.selectedPlayerIndex);
 
-			// Apply animations
+			// Apply custom animations
 			//ApplyAnimationClips();
 
 			// Start retrieving animation values
 			StartCoroutine(UpdateAnimationVariables());
 
-			// Setup Cinemachine
-			SetupCamera();
+			if (playerType == PlayerType.User)
+			{
+				// Setup Cinemachine
+				SetupCamera();
+			}
 		}
 
 		private void Update()
 		{
-			Rotate();
-			Move();
-			Jump();
-			CameraBobbing();
-			HandleMovementType();
-			CheckSubmersion();
+			// If currently being controlled by the player themself
+			if (playerType == PlayerType.User)
+			{
+				if (state == PlayerState.Movement)
+				{
+					PlayerMovement();
+					PlayerFunctionality();
+				}
+				else if (state == PlayerState.Transitioning)
+				{
+
+				}
+				else if (state == PlayerState.Vehicle)
+				{
+
+				}
+				else if (true)
+				{
+
+				}
+			}
+			// If the player movement is being controlled by AI
+			else if (playerType == PlayerType.AI)
+			{
+
+			}
+			// Networked movement
+			else
+			{
+
+			}
 
 			// Apply a new player model manually
 			if (models.applyModel)
@@ -128,9 +165,28 @@ namespace Player
 			}
 		}
 
+		void PlayerMovement()
+		{
+			Rotate();
+			Move();
+			Jump();
+			CameraBobbing();
+			HandleMovementType();
+			CheckSubmersion();
+			Slide();
+		}
+
+		void PlayerFunctionality()
+		{
+			Interact();
+		}
+
 		private void FixedUpdate()
 		{
-			ProcessPhysics();
+			if (state == PlayerState.Movement)
+			{
+				ApplyMovement();
+			}
 		}
 
 		void SetupCamera()
@@ -140,7 +196,7 @@ namespace Player
 			look.cinemachineBob = look.cinemachineCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
 		}
 
-		void ProcessPhysics()
+		void ApplyMovement()
 		{
 			float speed = movement.walkSpeed;  // Default to walking speed
 
@@ -206,6 +262,43 @@ namespace Player
 			}
 		}
 
+		void ApplySlideFriction()
+		{
+			Vector3 horizontalVelocity = new Vector3(physics.playerBody.velocity.x, 0, physics.playerBody.velocity.z);
+			horizontalVelocity *= (1 - movement.slideFriction * Time.deltaTime);
+			physics.playerBody.velocity = new Vector3(horizontalVelocity.x, physics.playerBody.velocity.y, horizontalVelocity.z);
+
+			// Stop sliding if the speed is too slow
+			if (horizontalVelocity.magnitude < 0.5f)
+			{
+				physics.isSliding = false;
+				movement.type = Movement.MovementType.Walking;
+			}
+		}
+
+		void Slide()
+		{
+			if (controls.Crouch && movement.type == Movement.MovementType.Running && physics.isGrounded)
+			{
+				StartSliding();
+			}
+
+			if (physics.isSliding)
+			{
+				ApplySlideFriction();
+			}
+		}
+
+		void StartSliding()
+		{
+			physics.isSliding = true;
+			movement.type = Movement.MovementType.Sliding;
+
+			// Apply a force in the direction of the player's movement
+			Vector3 slideForce = physics.moveDirection.normalized * movement.slideSpeed;
+			physics.playerBody.AddForce(slideForce, ForceMode.VelocityChange);
+		}
+
 		void CameraBobbing()
 		{
 			if (animations.cameraBob)
@@ -258,9 +351,15 @@ namespace Player
 
 		void OnDrawGizmosSelected()
 		{
-			// Draw the ray in red
-			Gizmos.color = Color.red;
+			// Draw the jump ray
+			Gizmos.color = Color.yellow;
 			Gizmos.DrawLine(physics.rayOrigin, physics.rayOrigin + (Vector3.down * physics.rayDistance));
+
+			// Draw the interact ray
+			Vector3 rayOrigin = look.cameraPivot.transform.position;
+			Vector3 rayDirection = look.cameraPivot.transform.forward;
+			Gizmos.color = Color.red; // Set the color of the ray to red
+			Gizmos.DrawLine(rayOrigin, rayOrigin + rayDirection * settings.interactions.distance);
 		}
 
 		void ApplyPlayerModel(int index)
@@ -342,6 +441,8 @@ namespace Player
 		// these variables less
 		IEnumerator UpdateAnimationVariables()
 		{
+			float waitTime = 1 / settings.performance.animationVariableUpdateRate;
+
 			while (true)
 			{
 				if (animations.animator != null)
@@ -352,17 +453,25 @@ namespace Player
 				{
 					Debug.Log("Player animator is null!");
 				}
-				yield return new WaitForSeconds(1 / settings.performance.animationVariableUpdateRate);
+				yield return new WaitForSeconds(waitTime);
 			}
 		}
 
 		private void UpdateAnimationValues()
 		{
+			float frameTime = 1 / settings.performance.animationVariableUpdateRate;
+			float smoothRate = animations.movementSmoothing;
+
 			animations.animator.SetInteger("Movement Type", (int)movement.type);
-			animations.animator.SetFloat("Horizontal", controls.HorizontalMove);
-			animations.animator.SetFloat("Vertical", controls.VerticalMove);
 			animations.animator.SetBool("isGrounded", physics.isGrounded);
 			animations.animator.SetBool("isMoving", physics.isMoving);
+
+			// Smooth values to stop instant animation change when opposite axis buttons get pressed
+			float horizontal = Mathf.Lerp(animations.animator.GetFloat("Horizontal"), controls.HorizontalMove, smoothRate * frameTime);
+			float vertical = Mathf.Lerp(animations.animator.GetFloat("Vertical"), controls.VerticalMove, smoothRate * frameTime);
+			animations.animator.SetFloat("Horizontal", horizontal);
+			animations.animator.SetFloat("Vertical", vertical);
+
 			// Using "jumpReset" instead of "Jump" to check if jump was pressed between the frames
 			// that this method was not called in (because this method is running at a different
 			// frame rate set in settings.performace)
@@ -371,6 +480,97 @@ namespace Player
 				controls.jumpReset = false;
 				animations.animator.SetTrigger("Jump");
 			}
+		}
+
+		// TODO: Set interact timer to limit all interactions to 0.25 seconds
+		void Interact()
+		{
+			// Get the camera's forward direction
+			Vector3 rayDirection = look.cameraPivot.transform.forward;
+
+			// Shoot a ray from the camera's position in its forward direction
+			RaycastHit hit;
+			if (UnityEngine.Physics.Raycast(look.cameraPivot.transform.position, rayDirection, out hit, settings.interactions.distance))
+			{
+				// Check if the hit object has an Interactable script attached
+				Interactable interactable = hit.collider.GetComponent<Interactable>();
+				if (interactable != null)
+				{
+					Debug.Log("Player can interact with this object");
+					ui.interactText.SetActive(true);
+
+					// Check if the Interact control is pressed
+					if (controls.Interact)
+					{
+						// Call interact
+						interactable.Interact(this);
+					}
+
+				}
+				else
+				{
+					ui.interactText.SetActive(false);
+				}
+			}
+		}
+
+		public void ApplyRagdoll()
+		{
+			if (state == PlayerState.Transitioning)
+			{
+				state = PlayerState.Ragdoll;
+			}
+		}
+
+		#region Interaction Calls
+		public void OnVehicleInteraction(VehicleStandardInput vehicleInput, VehicleController vehicleController)
+		{
+			if (state == PlayerState.Movement)
+			{
+				// Entering vehicle
+				state = PlayerState.Transitioning;
+				OnVehicleInteractionEnter(vehicleInput, vehicleController);
+			}
+			else if (state == PlayerState.Vehicle)
+			{
+				// Exiting vehicle
+				state = PlayerState.Transitioning;
+				OnVehicleInteractionExit(vehicleInput, vehicleController);
+			}
+		}
+
+		private void OnVehicleInteractionEnter(VehicleStandardInput vehicleInput, VehicleController vehicleController)
+		{
+			// Play getting in vehicle animation
+			transitions.target = vehicleController.transform;
+		}
+
+		private void OnVehicleInteractionExit(VehicleStandardInput vehicleInput, VehicleController vehicleController)
+		{
+			
+		}
+
+		public void OnItemInteraction(Item item)
+		{
+			inventory.Add(item);
+			AttachItem(item);
+			item.AddToInventory(this);
+		}
+
+		public void OnDoorInteraction(Door door)
+		{
+
+		}
+		#endregion
+
+		void AttachItem(Item item)
+		{
+
+		}
+
+		public void OnVehicleEnter(VehicleStandardInput vehicleInput, VehicleController vehicleController)
+		{
+
 		}
 	}
 
@@ -400,6 +600,23 @@ namespace Player
 
 	#region Public Variable Classes
 	[Serializable]
+	public class AI
+	{
+
+
+		[Serializable]
+		public class UserControlled
+		{
+
+		}
+		[Serializable]
+		public class SystemControlled
+		{
+
+		}
+	}
+
+	[Serializable]
 	public class Animations
 	{
 		private PlayerController controller;
@@ -410,6 +627,8 @@ namespace Player
 		[Tooltip("Uses IK to allow the player's animation to dynamically change it's animation based off of the environment \n" +
 			" (will prevent holding items clipping walls and feet clipping ground).")]
 		public bool reactToEnvironment = true;
+		public float movementSmoothing = 5;
+
 		[SerializeField]
 		internal RuntimeAnimatorController animationController;
 		[SerializeField]
@@ -514,15 +733,24 @@ namespace Player
 	{
 		private PlayerController controller;
 
+		private bool controlLock = false;
+
 		public float HorizontalMove
 		{
 			get
 			{
+				if (!controlLock)
+				{
 #if ENABLE_INPUT_SYSTEM
-				return movementAction.ReadValue<Vector2>().x;
+					return movementAction.ReadValue<Vector2>().x;
 #else
 				return Input.GetAxis("Horizontal");
 #endif
+				}
+				else
+				{
+					return 0;
+				}
 			}
 		}
 
@@ -530,27 +758,34 @@ namespace Player
 		{
 			get
 			{
+				if (!controlLock)
+				{
 #if ENABLE_INPUT_SYSTEM
-				return movementAction.ReadValue<Vector2>().y;
+					return movementAction.ReadValue<Vector2>().y;
 #else
 				return Input.GetAxis("Vertical");
 #endif
+				}
+				else
+				{
+					return 0;
+				}
 			}
 		}
 
-		public bool jumpReset;
-
+		internal bool jumpReset;
 		public bool Jump
 		{
 			get
 			{
-
-#if ENABLE_INPUT_SYSTEM
-				if (jumpAction.triggered)
+				if (!controlLock)
 				{
-					jumpReset = true;
-				}
-				return jumpAction.triggered;
+#if ENABLE_INPUT_SYSTEM
+					if (jumpAction.triggered)
+					{
+						jumpReset = true;
+					}
+					return jumpAction.triggered;
 #else
 				if (Input.GetButtonDown("Jump"))
 				{
@@ -558,6 +793,12 @@ namespace Player
 				}
 				return Input.GetButtonDown("Jump");
 #endif
+				}
+				else
+				{
+					jumpReset = false;
+					return false;
+				}
 			}
 		}
 
@@ -567,23 +808,25 @@ namespace Player
 		{
 			get
 			{
-				if (!runTrigger)
+				if (!controlLock)
 				{
+					if (!runTrigger)
+					{
 #if ENABLE_INPUT_SYSTEM
 
-					return sprintAction.ReadValue<float>() > holdThreshold;
+						return sprintAction.ReadValue<float>() > holdThreshold;
 #else
 					return Input.GetButton("Sprint");
 #endif
-				}
-				else
-				{
-#if ENABLE_INPUT_SYSTEM
-					if (sprintAction.triggered)
-					{
-						triggerRun = !triggerRun;
-						triggerCrouch = !triggerRun;
 					}
+					else
+					{
+#if ENABLE_INPUT_SYSTEM
+						if (sprintAction.triggered)
+						{
+							triggerRun = !triggerRun;
+							triggerCrouch = !triggerRun;
+						}
 
 #else
 					if (Input.GetButtonDown("Sprint"))
@@ -591,7 +834,13 @@ namespace Player
 						triggerRun = !triggerRun;
 					}
 #endif
-					return triggerRun;
+						return triggerRun;
+					}
+				}
+				else
+				{
+					triggerRun = false;
+					return false;
 				}
 			}
 		}
@@ -601,23 +850,25 @@ namespace Player
 		{
 			get
 			{
-				if (!crouchTrigger)
+				if (!controlLock)
 				{
+					if (!crouchTrigger)
+					{
 #if ENABLE_INPUT_SYSTEM
 
-					return crouchAction.ReadValue<float>() > holdThreshold;
+						return crouchAction.ReadValue<float>() > holdThreshold;
 #else
 					return Input.GetButton("Crouch");
 #endif
-				}
-				else
-				{
-#if ENABLE_INPUT_SYSTEM
-					if (crouchAction.triggered)
-					{
-						triggerCrouch = !triggerCrouch;
-						triggerRun = !triggerCrouch;
 					}
+					else
+					{
+#if ENABLE_INPUT_SYSTEM
+						if (crouchAction.triggered)
+						{
+							triggerCrouch = !triggerCrouch;
+							triggerRun = !triggerCrouch;
+						}
 
 #else
 					if (Input.GetButtonDown("Crouch"))
@@ -626,7 +877,13 @@ namespace Player
 						triggerRun = !triggerCrouch;
 					}
 #endif
-					return triggerCrouch;
+						return triggerCrouch;
+					}
+				}
+				else
+				{
+					triggerCrouch = false;
+					return false;
 				}
 			}
 		}
@@ -635,11 +892,18 @@ namespace Player
 		{
 			get
 			{
+				if (!controlLock)
+				{
 #if ENABLE_INPUT_SYSTEM
-				return mouseAction.ReadValue<Vector2>().x;
+					return mouseAction.ReadValue<Vector2>().x; ;
 #else
-				return Input.GetAxis("Mouse X")
+					return Input.GetAxis("Mouse X");
 #endif
+				}
+				else
+				{
+					return 0;
+				}
 			}
 		}
 
@@ -647,51 +911,100 @@ namespace Player
 		{
 			get
 			{
+				if (!controlLock)
+				{
 #if ENABLE_INPUT_SYSTEM
-				return mouseAction.ReadValue<Vector2>().y;
+					return mouseAction.ReadValue<Vector2>().y;
 #else
-				return Input.GetAxis("Mouse Y")
+				return Input.GetAxis("Mouse Y");
 #endif
+				}
+				else
+				{
+					return 0;
+				}
 			}
 		}
 
+		public bool interactReset;
 		public bool Interact
 		{
 			get
 			{
+				if (!controlLock)
+				{
 #if ENABLE_INPUT_SYSTEM
-				return interactAction.triggered;
+					interactReset = true;
+					return interactAction.triggered;
 #else
+				interactReset = true;
 				return Input.GetButtonDown("Interact");
 #endif
+				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 
-		// Avoid using this on items as the "Use" event will trigger item methods
 		public bool Use
 		{
 			get
 			{
+				if (!controlLock)
+				{
 #if ENABLE_INPUT_SYSTEM
 
-				return useAction.ReadValue<float>() > holdThreshold;
+					return useAction.triggered;
 #else
-				return Input.GetButton("Fire");
+					return Input.GetButton("Fire");
 #endif
+				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 
-		// Avoid using this on items as the "Aim" event will trigger item methods
 		public bool Aim
 		{
 			get
 			{
+				if (!controlLock)
+				{
 #if ENABLE_INPUT_SYSTEM
 
-				return aimAction.ReadValue<float>() > holdThreshold;
+					return aimAction.ReadValue<float>() > holdThreshold;
 #else
 				return Input.GetButton("Aim");
 #endif
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
+		public bool DropItem
+		{
+			get
+			{
+				if (!controlLock)
+				{
+#if ENABLE_INPUT_SYSTEM
+
+					return dropAction.triggered;
+#else
+				return Input.GetButton("Drop Item");
+#endif
+				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 
@@ -707,15 +1020,16 @@ namespace Player
 		private InputAction interactAction;
 		private InputAction useAction; // Use items (shoot, turn torch light on/off, ect)
 		private InputAction aimAction; // Use items secondary (aim, change torch colour, ect)
+		private InputAction dropAction;
 
-#region Editor Variables
+		#region Editor Variables
 		[SerializeField]
 		internal float holdThreshold = 0.4f;
 		[SerializeField, Tooltip("Whether run needs to be held to stay running.")]
 		internal bool runTrigger = false;
 		[SerializeField, Tooltip("Whether crouch needs to be held to stay running.")]
 		internal bool crouchTrigger = true;
-#endregion
+		#endregion
 
 		internal void OnEnable()
 		{
@@ -748,6 +1062,7 @@ namespace Player
 			crouchAction = input.actions["Crouch"];
 			interactAction = input.actions["Interact"];
 			useAction = input.actions["Use"];
+			dropAction = input.actions["Drop Item"];
 #endif
 		}
 
@@ -758,9 +1073,28 @@ namespace Player
 	{
 		private PlayerController controller;
 
+		internal Item curItem;
+
+		internal List<Item> inventory = new List<Item>();
+
+		[SerializeField]
+		internal int size = 3;
+
 		internal void Start(PlayerController controller)
 		{
 			this.controller = controller;
+		}
+
+		internal void Add(Item item)
+		{
+			if (inventory.Count < size)
+			{
+				inventory.Add(item);
+			}
+			else
+			{
+				Debug.Log("Inventory is maxed out bitch");
+			}
 		}
 	}
 
@@ -769,7 +1103,7 @@ namespace Player
 	{
 		private PlayerController controller;
 
-#region Inspector Variables
+		#region Inspector Variables
 		[SerializeField]
 		public CinemachineVirtualCamera cinemachineCamera;
 		[SerializeField]
@@ -786,7 +1120,7 @@ namespace Player
 
 		[SerializeField]
 		internal ParticleSystem cameraEffects;
-#endregion
+		#endregion
 
 		internal CinemachineBasicMultiChannelPerlin cinemachineBob;
 
@@ -809,7 +1143,7 @@ namespace Player
 			this.controller = controller;
 		}
 
-#region Inspector Variables
+		#region Inspector Variables
 		[SerializeField]
 		internal int selectedPlayerIndex = 0;
 		[SerializeField]
@@ -818,7 +1152,7 @@ namespace Player
 		internal bool applyModel = false;
 		[SerializeField, Space]
 		internal Transform modelTransform;
-#endregion
+		#endregion
 	}
 
 	[Serializable]
@@ -826,7 +1160,7 @@ namespace Player
 	{
 		private PlayerController controller;
 
-#region Inspector Variables
+		#region Inspector Variables
 		[SerializeField]
 		internal float crouchSpeed = 2;
 		[SerializeField]
@@ -839,18 +1173,22 @@ namespace Player
 		internal float climbSpeed = 2;
 		[SerializeField]
 		internal float swimSpeed = 2;
+		[SerializeField]
+		internal float slideFriction = 0.5f;  // The friction when sliding. Lower values make the slide last longer.
+		[SerializeField]
+		internal float slideSpeed = 10f;   // The speed at which the player slides.
 
-		// Fake friction. Can use to simulate friction, however this smoothes the input axis rather than rigidbody itself.
+		// Fake friction for movement. Can use to simulate friction for movement only, however this smoothes the input axis rather than rigidbody itself.
 		[SerializeField]
 		internal float smoothing = 10;
 
 		// Slows the player down if player is in water
 		[SerializeField]
 		internal float submergedSpeedMultiplier = 0.5f;
-#endregion
+		#endregion
 
 		internal float jumpHeightConversion = 4f;
-		internal enum MovementType { Walking = 0, Running = 1, Crouching = 2, Climbing = 3, Swimming = 4 }
+		internal enum MovementType { Walking = 0, Running = 1, Crouching = 2, Climbing = 3, Swimming = 4, Sliding = 5 }
 		internal MovementType type = MovementType.Walking;
 
 		internal void Start(PlayerController controller)
@@ -870,7 +1208,7 @@ namespace Player
 	{
 		private PlayerController controller;
 
-#region Inspector Variables
+		#region Inspector Variables
 		[SerializeField]
 		internal float groundCheckDistance = 0.1f;
 		[SerializeField]
@@ -882,7 +1220,10 @@ namespace Player
 		internal LayerMask groundMask;
 		[SerializeField]
 		internal Transform submergePoint;
-#endregion
+		#endregion
+
+		internal bool isRagdoll = false;
+		internal bool isSliding = false;
 
 		public bool isMoving
 		{
@@ -931,11 +1272,20 @@ namespace Player
 		internal enum PlayType { FirstPerson, ThirdPerson }
 
 		public Performance performance;
+		public Interactions interactions;
 
 		[Serializable]
 		public class Performance
 		{
 			public int animationVariableUpdateRate = 30;
+			public int checkInteractionRate = 20;
+		}
+
+		[Serializable]
+		public class Interactions
+		{
+			[SerializeField]
+			internal int distance;
 		}
 
 		internal void Start(PlayerController controller)
@@ -949,7 +1299,7 @@ namespace Player
 	{
 		private PlayerController controller;
 
-#region Inspector Variables
+		#region Inspector Variables
 		[SerializeField]
 		internal AudioClip[] footstepsGrass;
 		[SerializeField]
@@ -962,7 +1312,7 @@ namespace Player
 		internal AudioClip[] footstepsGravel;
 
 		public AudioSource audio;
-#endregion
+		#endregion
 
 		internal void Start(PlayerController controller)
 		{
@@ -975,6 +1325,8 @@ namespace Player
 	{
 		private PlayerController controller;
 
+		internal Transform target;
+
 		internal void Start(PlayerController controller)
 		{
 			this.controller = controller;
@@ -986,10 +1338,22 @@ namespace Player
 	{
 		private PlayerController controller;
 
+		#region Inspector Variables
+		[SerializeField]
+		internal GameObject playerUI;
+		[SerializeField]
+		internal GameObject vehicleUI;
+		[SerializeField]
+		internal GameObject menuUI;
+		[Space]
+		[SerializeField]
+		internal GameObject interactText;
+		#endregion
+
 		internal void Start(PlayerController controller)
 		{
 			this.controller = controller;
 		}
 	}
-#endregion
+	#endregion
 }

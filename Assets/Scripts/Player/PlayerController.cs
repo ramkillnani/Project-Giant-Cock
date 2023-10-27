@@ -210,7 +210,7 @@ namespace Player
 
 			Vector3 move = physics.moveDirection * speed * Time.fixedDeltaTime;
 
-			if (!ai.navMeshAgent.enabled)
+			if (!ai.navMeshAgent.enabled && state == PlayerState.Movement)
 			{
 				physics.playerBody.MovePosition(physics.playerBody.position + move);
 
@@ -219,37 +219,47 @@ namespace Player
 
 		void Rotate()
 		{
-			// Handle player rotation
-			float mouseX = controls.HorizontalLook * look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
-			float mouseY = controls.VerticalLook * look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
-
-			physics.xRotation -= mouseY;
-			physics.xRotation = Mathf.Clamp(physics.xRotation, -90f, 90f);
-
-			Transform go = look.cameraPivot;
-			if (go != null)
+			if (state == PlayerState.Movement)
 			{
-				go.localRotation = Quaternion.Euler(physics.xRotation, 0f, 0f);
-			}
+				// Handle player rotation
+				float mouseX = controls.HorizontalLook * look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
+				float mouseY = controls.VerticalLook * look.cameraSensitivity * (Time.deltaTime + Time.deltaTime / 2);
 
-			transform.Rotate(Vector3.up * mouseX);
+				physics.xRotation -= mouseY;
+				physics.xRotation = Mathf.Clamp(physics.xRotation, -90f, 90f);
+
+				Transform go = look.cameraPivot;
+				if (go != null)
+				{
+					go.localRotation = Quaternion.Euler(physics.xRotation, 0f, 0f);
+				}
+
+				transform.Rotate(Vector3.up * mouseX);
+			}
+			else if (state == PlayerState.Vehicle)
+			{
+				// Send rotation controls to vehicle camera?
+			}
 		}
 
 		void Move()
 		{
 			if (!ai.navMeshAgent.enabled)
 			{
-				float moveForwardBackward = controls.VerticalMove;
-				float moveLeftRight = controls.HorizontalMove;
+				if (state == PlayerState.Movement)
+				{
+					float moveForwardBackward = controls.VerticalMove;
+					float moveLeftRight = controls.HorizontalMove;
 
-				Vector3 desiredMoveDirection = transform.right * moveLeftRight + transform.forward * moveForwardBackward;
+					Vector3 desiredMoveDirection = transform.right * moveLeftRight + transform.forward * moveForwardBackward;
 
-				// Normalize the movement vector if its magnitude > 1 to prevent faster diagonal movement
-				if (desiredMoveDirection.magnitude > 1f)
-					desiredMoveDirection.Normalize();
+					// Normalize the movement vector if its magnitude > 1 to prevent faster diagonal movement
+					if (desiredMoveDirection.magnitude > 1f)
+						desiredMoveDirection.Normalize();
 
-				// Smoothing movement
-				physics.moveDirection = Vector3.Lerp(physics.moveDirection, desiredMoveDirection, movement.smoothing * Time.deltaTime);
+					// Smoothing movement
+					physics.moveDirection = Vector3.Lerp(physics.moveDirection, desiredMoveDirection, movement.smoothing * Time.deltaTime);
+				}
 			}
 		}
 

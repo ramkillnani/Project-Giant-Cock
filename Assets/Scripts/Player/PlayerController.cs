@@ -452,6 +452,12 @@ namespace Player
 				controls.jumpReset = false;
 				animations.animator.SetTrigger("Jump");
 			}
+
+			if (vehicles.currentVehicle != null)
+			{
+				animations.animator.SetBool("IsDriver", vehicles.currentVehicle.GetSeatFromPlayer(this).isDriver);
+
+			}
 		}
 
 		// TODO: Set interact timer to limit all interactions to 0.25 seconds
@@ -719,7 +725,7 @@ namespace Player
 			// Apply positon
 			physics.playerBody.isKinematic = true;
 			transform.parent = vehicles.currentVehicle.GetSeatFromPlayer(this).playerParent;
-			transform.localPosition = Vector3.zero;
+			transform.localPosition = new Vector3(0, vehicles.cameraHeightOffset, 0);
 			transform.localRotation = Quaternion.identity;
 		}
 
@@ -1667,6 +1673,7 @@ namespace Player
 		private PlayerController controller;
 
 		#region Inspector Variables
+		public float cameraHeightOffset = -0.4f;
 		public VehicleManager currentVehicle;
 
 		[SerializeField]

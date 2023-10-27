@@ -14,6 +14,19 @@ public class VehicleManager : MonoBehaviour
 
 	public VehicleSeat[] vehicleSeats;
 
+	public VehicleSeat GetSeatFromPlayer(PlayerController controller)
+	{
+		for (int i = 0; i < vehicleSeats.Length; i++)
+		{
+			if (vehicleSeats[i].seatedPlayer == controller)
+			{
+				return vehicleSeats[i];
+			}
+		}
+
+		return null;
+	}
+
 	public float GetSpeed
 	{
 		get
@@ -94,7 +107,7 @@ public class VehicleSeat
 	public Transform doorHandle;
 	[Tooltip("The position the player will walk to, to be able to open the vehicle's door.")]
 	public Transform movePosition;
-	public Transform sitPosition;
+	public Transform playerParent;
 
 	[HideInInspector]
 	public PlayerController seatedPlayer = null;

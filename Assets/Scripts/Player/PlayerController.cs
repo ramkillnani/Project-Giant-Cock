@@ -9,6 +9,8 @@ using Items;
 using EVP;
 using System.Linq;
 using UnityEngine.AI;
+using System.Threading;
+using System.Net.PeerToPeer.Collaboration;
 
 // Brackets show this - ("What adding this functionality will do for this script/How important it is to finish")
 // TODO (Functionality/High): cull out character if camera is in first person
@@ -257,7 +259,7 @@ namespace Player
 			if (controls.Jump && physics.isGrounded)
 			{
 				physics.playerBody.velocity = new Vector3(physics.playerBody.velocity.x, movement.jumpHeight * movement.jumpHeightConversion, physics.playerBody.velocity.z);
-				
+
 			}
 		}
 
@@ -394,7 +396,7 @@ namespace Player
 			animations.animator = animator;
 		}
 
-		
+
 		// Due to the nature of using "get" for the movement variables,
 		// calling these variables multiple times can cause a performance drop.
 		// Due to this, I have implemented an animation update rate to call
@@ -520,7 +522,7 @@ namespace Player
 			{
 				// Move player towards walk-in point
 				SetVehicleWaypoint(vehicleManager);
-				
+
 			}
 			else if (state == PlayerState.Vehicle)
 			{
@@ -558,6 +560,8 @@ namespace Player
 				selectedSeat = handleDistances.OrderBy(kvp => kvp.Value).First().Key;
 			}
 
+			selectedSeat.seatedPlayer = this;
+
 			// Set destination to the selected vehicle's seat
 			ai.EnableAgent(selectedSeat.movePosition);
 
@@ -567,7 +571,7 @@ namespace Player
 			StartCoroutine(CheckVehicleDestinationReached(vehicleManager, selectedSeat));
 		}
 
-		
+
 
 		IEnumerator CheckVehicleDestinationReached(VehicleManager vehicleManager, VehicleSeat selectedSeat)
 		{
@@ -586,12 +590,15 @@ namespace Player
 						ai.SetDestination(selectedSeat.movePosition);
 					}
 
-					if (!ai.navMeshAgent.hasPath && ai.navMeshAgent.enabled)
+					if (!ai.navMeshAgent.hasPath && ai.navMeshAgent.enabled && ai.navMeshAgent.velocity.sqrMagnitude == 0f)
 					{
-						//ai.DisableAgent();
-						OnVehicleInteractionEnter(vehicleManager);
+						if (Vector3.Distance(selectedSeat.movePosition.position, transform.position) <= ai.stoppingDistance)
+						{
+							//ai.DisableAgent();
+							OnVehicleInteractionEnter(vehicleManager, selectedSeat);
 
-						yield break;
+							yield break;
+						}
 					}
 				}
 				else
@@ -599,7 +606,7 @@ namespace Player
 					ai.DisableAgent();
 					yield break;
 				}
-				
+
 
 				yield return new WaitForFixedUpdate();
 			}
@@ -609,19 +616,59 @@ namespace Player
 		public void OnVehicleInteractCancel()
 		{
 			StopCoroutine(nameof(CheckVehicleDestinationReached));
+			animations.SetState(0);
 		}
 
-		private void OnVehicleInteractionEnter(VehicleManager vehicleManager)
+		private void OnVehicleInteractionEnter(VehicleManager vehicleManager, VehicleSeat seat)
 		{
 			Debug.Log("Entering vehicle!!");
 
+			ai.DisableAgent();
+
+
+			StartCoroutine(TurnPlayerTowardsDoor(seat, vehicleManager));
 			// Set Layer to driving layer
 			animations.SetState(1);
 
 			// Play getting in vehicle animation
 
-			vehicles.currentVehicle = vehicleManager;
+			//vehicles.currentVehicle = vehicleManager;
 
+		}
+
+		IEnumerator TurnPlayerTowardsDoor(VehicleSeat seat, VehicleManager vehicleManager)
+		{
+
+			while (true)
+			{
+				if (controls.HorizontalMove == 0 && controls.VerticalMove == 0)
+				{
+					// Set height to be the same so vertical rotation does not happen
+					Vector3 camPos = new Vector3(transform.position.x, 0, transform.position.z);
+					Vector3 handlePos = new Vector3(seat.doorHandle.position.x, 0, seat.doorHandle.position.z);
+					Vector3 direction = handlePos - camPos;
+
+					// Apply Rotation
+					transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), 5 * Time.deltaTime);
+
+					if (Vector3.Distance(transform.rotation.eulerAngles, Quaternion.LookRotation(direction).eulerAngles) < 0.1f)
+					{
+						Debug.Log("Player should be looking at door handle");
+						// Remove this as it should be run from an animation state behaviour
+						vehicles.currentVehicle = vehicleManager;
+						OnVehicleEnter();
+						yield break;
+					}
+
+					yield return null;
+				}
+				else
+				{
+					Debug.Log("Player look interupted");
+
+					yield break;
+				}
+			}
 		}
 
 		private void OnVehicleInteractionExit(VehicleManager vehicleManager)
@@ -643,11 +690,27 @@ namespace Player
 
 				vehicleInput.enabled = true;
 				vehicleInput.player = this;
+
+				PlacePlayerInCar();
 			}
 			else
 			{
 				Debug.LogError("FAILED TO GET CURRENT VEHICLE!");
 			}
+		}
+
+		// Make sure player animation has played or player will snap into car
+		void PlacePlayerInCar()
+		{
+			Debug.Log("Placing player in car");
+			state = PlayerState.Vehicle;
+			// Turn off movement collider
+			physics.playerCollider.enabled = false;
+			// Apply positon
+			physics.playerBody.isKinematic = true;
+			transform.parent = vehicles.currentVehicle.GetSeatFromPlayer(this).playerParent;
+			transform.localPosition = Vector3.zero;
+			transform.localRotation = Quaternion.identity;
 		}
 
 		public void LockControls()
@@ -693,6 +756,9 @@ namespace Player
 
 		internal NavMeshAgent navMeshAgent;
 		internal Transform wayPoint;
+
+		[SerializeField]
+		internal float stoppingDistance = 0.3f;
 
 		internal void Start(PlayerController controller)
 		{
@@ -955,7 +1021,7 @@ namespace Player
 
 								return movementAction.ReadValue<Vector2>().x;
 							}
-							
+
 						}
 					}
 					else
@@ -1010,7 +1076,7 @@ namespace Player
 					//		return movementAction.ReadValue<Vector2>().x;
 					//	}
 					//}
-					return controller.ai.navMeshAgent.velocity.normalized.magnitude;
+					return controller.ai.navMeshAgent.velocity.sqrMagnitude;
 				}
 			}
 		}

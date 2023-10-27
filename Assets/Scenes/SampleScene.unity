@@ -511,7 +511,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 324047158}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.22, y: 0, z: -0.3}
+  m_LocalPosition: {x: -2.375, y: 0, z: -0.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1308,7 +1308,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 577473575}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.22, y: 0, z: -0.3}
+  m_LocalPosition: {x: 2.375, y: 0, z: -0.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2885,6 +2885,7 @@ MonoBehaviour:
     menuUI: {fileID: 0}
     interactText: {fileID: 2136490204}
   vehicles:
+    cameraHeightOffset: -0.4
     currentVehicle: {fileID: 0}
     transitionTime: 1
 --- !u!54 &1252421162
@@ -6394,6 +6395,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96052d171b69193449ef0cdc9cfdf84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _id: 1001
+  _icon: {fileID: 0}
+  droppedGameobject: {fileID: 0}
+  firstPersonGameObject: {fileID: 0}
+  thirdPersonGameObject: {fileID: 0}
+  droppedRotationPhysics: 0
+  _sound:
+    OnAddToInventory:
+      audioPlayType: 0
+      clips: []
+    OnRemoveFromInventory:
+      audioPlayType: 0
+      clips: []
+    OnEquip:
+      audioPlayType: 0
+      clips: []
+    OnUnequip:
+      audioPlayType: 0
+      clips: []
+    OnUse:
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+    - audioPlayType: 0
+      clips: []
+  controls:
+    usageButtons: []
   vehicleController: {fileID: 0}
   input: {fileID: 0}
   vehicleSeats:

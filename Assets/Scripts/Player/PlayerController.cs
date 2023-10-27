@@ -672,6 +672,7 @@ namespace Player
 						Debug.Log("Player should be looking at door handle");
 						// Remove this as it should be run from an animation state behaviour
 						vehicles.currentVehicle = vehicleManager;
+						inventory.curItem = vehicleManager;
 						OnVehicleEnter();
 						yield break;
 					}

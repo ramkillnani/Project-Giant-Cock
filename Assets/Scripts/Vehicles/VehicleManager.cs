@@ -4,8 +4,9 @@ using UnityEngine;
 using EVP;
 using Player;
 using System;
+using Items;
 
-public class VehicleManager : MonoBehaviour
+public class VehicleManager : Item
 {
 	[HideInInspector]
 	public VehicleController vehicleController;

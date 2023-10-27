@@ -7,6 +7,8 @@ using Cinemachine;
 using UnityEngine.InputSystem;
 using Items;
 using EVP;
+using System.Linq;
+using UnityEngine.AI;
 
 // Brackets show this - ("What adding this functionality will do for this script/How important it is to finish")
 // TODO (Functionality/High): cull out character if camera is in first person
@@ -22,13 +24,14 @@ namespace Player
 	{
 		public static PlayerController localPlayer = null;
 
-		public enum PlayerType { User, AI, Network }
+		public enum PlayerType { User, Network }
 		public PlayerType playerType = PlayerType.User;
 
-		public enum PlayerState { Movement, Ragdoll, Vehicle, Transitioning }
+		public enum PlayerState { Movement, Ragdoll, Vehicle }
 		public PlayerState state = PlayerState.Movement;
 
 		#region Assorted variables
+		public AI ai;
 		// Class that holds animation variables related to the player
 		public Animations animations;
 		// Class that holds the control variables
@@ -47,12 +50,12 @@ namespace Player
 		public Settings settings;
 		// Class that holds variables which handles player sounds
 		public Sound sound;
-		// Class that holds variables to control camera & character transitions (such as transitioning from first person to third person, or entering a vehicle ect.)
-		public Transitions transitions;
 		// Placeholder for now
 		public Networking networking;
 		// Class that holds references to GUI elements
 		public UI ui;
+		// Class that holds vehicle stuff
+		public Vehicles vehicles;
 		#endregion
 
 		private void Awake()
@@ -81,6 +84,7 @@ namespace Player
 
 		void LateInit()
 		{
+			ai.Start(this);
 			animations.Start(this);
 			inventory.Start(this);
 			look.Start(this);
@@ -89,7 +93,6 @@ namespace Player
 			physics.Start(this);
 			settings.Start(this);
 			sound.Start(this);
-			transitions.Start(this);
 			ui.Start(this);
 		}
 
@@ -133,23 +136,10 @@ namespace Player
 					PlayerMovement();
 					PlayerFunctionality();
 				}
-				else if (state == PlayerState.Transitioning)
-				{
-
-				}
 				else if (state == PlayerState.Vehicle)
 				{
 
 				}
-				else if (true)
-				{
-
-				}
-			}
-			// If the player movement is being controlled by AI
-			else if (playerType == PlayerType.AI)
-			{
-
 			}
 			// Networked movement
 			else
@@ -217,7 +207,12 @@ namespace Player
 			}
 
 			Vector3 move = physics.moveDirection * speed * Time.fixedDeltaTime;
-			physics.playerBody.MovePosition(physics.playerBody.position + move);
+
+			if (!ai.navMeshAgent.enabled)
+			{
+				physics.playerBody.MovePosition(physics.playerBody.position + move);
+
+			}
 		}
 
 		void Rotate()
@@ -240,17 +235,20 @@ namespace Player
 
 		void Move()
 		{
-			float moveForwardBackward = controls.VerticalMove;
-			float moveLeftRight = controls.HorizontalMove;
+			if (!ai.navMeshAgent.enabled)
+			{
+				float moveForwardBackward = controls.VerticalMove;
+				float moveLeftRight = controls.HorizontalMove;
 
-			Vector3 desiredMoveDirection = transform.right * moveLeftRight + transform.forward * moveForwardBackward;
+				Vector3 desiredMoveDirection = transform.right * moveLeftRight + transform.forward * moveForwardBackward;
 
-			// Normalize the movement vector if its magnitude > 1 to prevent faster diagonal movement
-			if (desiredMoveDirection.magnitude > 1f)
-				desiredMoveDirection.Normalize();
+				// Normalize the movement vector if its magnitude > 1 to prevent faster diagonal movement
+				if (desiredMoveDirection.magnitude > 1f)
+					desiredMoveDirection.Normalize();
 
-			// Smoothing movement
-			physics.moveDirection = Vector3.Lerp(physics.moveDirection, desiredMoveDirection, movement.smoothing * Time.deltaTime);
+				// Smoothing movement
+				physics.moveDirection = Vector3.Lerp(physics.moveDirection, desiredMoveDirection, movement.smoothing * Time.deltaTime);
+			}
 		}
 
 		void Jump()
@@ -259,6 +257,7 @@ namespace Player
 			if (controls.Jump && physics.isGrounded)
 			{
 				physics.playerBody.velocity = new Vector3(physics.playerBody.velocity.x, movement.jumpHeight * movement.jumpHeightConversion, physics.playerBody.velocity.z);
+				
 			}
 		}
 
@@ -395,46 +394,7 @@ namespace Player
 			animations.animator = animator;
 		}
 
-		void ApplyAnimationClips()
-		{
-			AnimatorOverrideController aoc = animations.animator.runtimeAnimatorController as AnimatorOverrideController;
-			Debug.Log(aoc.name + "Override controller created.");
-			if (aoc != null)
-			{
-				// Idle
-				aoc["Idle"] = animations.animationClips.idling.idle;
-				aoc["Crouching Idle"] = animations.animationClips.idling.crouchIdle;
-
-				// Jogging
-				aoc["Jog Forward"] = animations.animationClips.walking.forward;
-				aoc["Jog Backward"] = animations.animationClips.walking.backward;
-				aoc["Jog Strafe Left"] = animations.animationClips.walking.left;
-				aoc["Jog Strafe Right"] = animations.animationClips.walking.right;
-
-				// Running
-				aoc["Run Forward"] = animations.animationClips.running.forward;
-				aoc["Left Strafe"] = animations.animationClips.running.left;
-				aoc["Right Strafe"] = animations.animationClips.running.right;
-
-				// Crouching
-				aoc["Crouched Walking"] = animations.animationClips.crouching.forward;
-				aoc["Crouched Walking Backwards"] = animations.animationClips.crouching.backward;
-				aoc["Crouched Sneaking Left"] = animations.animationClips.crouching.left;
-				aoc["Crouched Sneaking Right"] = animations.animationClips.crouching.left;
-
-				// Climbing
-
-				// Swimming
-
-			}
-			Debug.Log("Applying override controller...");
-			animations.animator.runtimeAnimatorController = aoc;
-			if (animations.animator.runtimeAnimatorController == aoc)
-			{
-				Debug.Log(animations.animator.runtimeAnimatorController.name + "override applied successfully!");
-			}
-		}
-
+		
 		// Due to the nature of using "get" for the movement variables,
 		// calling these variables multiple times can cause a performance drop.
 		// Due to this, I have implemented an animation update rate to call
@@ -459,7 +419,7 @@ namespace Player
 
 		private void UpdateAnimationValues()
 		{
-			float frameTime = 1 / settings.performance.animationVariableUpdateRate;
+			float frameTime = Time.deltaTime; //1 / settings.performance.animationVariableUpdateRate;
 			float smoothRate = animations.movementSmoothing;
 
 			animations.animator.SetInteger("Movement Type", (int)movement.type);
@@ -496,6 +456,14 @@ namespace Player
 				Interactable interactable = hit.collider.GetComponent<Interactable>();
 				if (interactable != null)
 				{
+					if (interactable.type == InteractType.Vehicle)
+					{
+						if (interactable.connectedVm.VehicleFull)
+						{
+							return; // return if vehicle is full
+						}
+					}
+
 					Debug.Log("Player can interact with this object");
 					ui.interactText.SetActive(true);
 
@@ -505,50 +473,28 @@ namespace Player
 						// Call interact
 						interactable.Interact(this);
 					}
-
 				}
 				else
 				{
 					ui.interactText.SetActive(false);
 				}
 			}
+			else
+			{
+				ui.interactText.SetActive(false);
+			}
 		}
 
 		public void ApplyRagdoll()
 		{
-			if (state == PlayerState.Transitioning)
-			{
-				state = PlayerState.Ragdoll;
-			}
+			//if (state == PlayerState.Transitioning)
+			//{
+			//	state = PlayerState.Ragdoll;
+			//}
 		}
 
 		#region Interaction Calls
-		public void OnVehicleInteraction(VehicleStandardInput vehicleInput, VehicleController vehicleController)
-		{
-			if (state == PlayerState.Movement)
-			{
-				// Entering vehicle
-				state = PlayerState.Transitioning;
-				OnVehicleInteractionEnter(vehicleInput, vehicleController);
-			}
-			else if (state == PlayerState.Vehicle)
-			{
-				// Exiting vehicle
-				state = PlayerState.Transitioning;
-				OnVehicleInteractionExit(vehicleInput, vehicleController);
-			}
-		}
 
-		private void OnVehicleInteractionEnter(VehicleStandardInput vehicleInput, VehicleController vehicleController)
-		{
-			// Play getting in vehicle animation
-			transitions.target = vehicleController.transform;
-		}
-
-		private void OnVehicleInteractionExit(VehicleStandardInput vehicleInput, VehicleController vehicleController)
-		{
-			
-		}
 
 		public void OnItemInteraction(Item item)
 		{
@@ -568,9 +514,150 @@ namespace Player
 
 		}
 
-		public void OnVehicleEnter(VehicleStandardInput vehicleInput, VehicleController vehicleController)
+		public void OnVehicleInteraction(VehicleManager vehicleManager)
 		{
+			if (state == PlayerState.Movement)
+			{
+				// Move player towards walk-in point
+				SetVehicleWaypoint(vehicleManager);
+				
+			}
+			else if (state == PlayerState.Vehicle)
+			{
+				// Exiting vehicle
+				//state = PlayerState.Transitioning;
+				OnVehicleInteractionExit(vehicleManager);
+			}
+		}
 
+		void SetVehicleWaypoint(VehicleManager vehicleManager)
+		{
+			VehicleSeat selectedSeat = null;
+
+			// Check if driver seat is empty
+			if (vehicleManager.GetDriverSeat != null)
+			{
+				selectedSeat = vehicleManager.GetDriverSeat;
+			}
+			else
+			{
+				// That means driver seat is taken
+				// Check for closest seat available
+
+				Dictionary<VehicleSeat, float> handleDistances = new Dictionary<VehicleSeat, float>();
+
+				for (int i = 0; i < vehicleManager.vehicleSeats.Length; i++)
+				{
+					// If its not a driver seat, add it
+					if (vehicleManager.vehicleSeats[i].isDriver == false)
+					{
+						handleDistances.Add(vehicleManager.vehicleSeats[i], Vector3.Distance(transform.position, vehicleManager.vehicleSeats[i].doorHandle.position));
+					}
+				}
+
+				selectedSeat = handleDistances.OrderBy(kvp => kvp.Value).First().Key;
+			}
+
+			// Set destination to the selected vehicle's seat
+			ai.EnableAgent(selectedSeat.movePosition);
+
+			LockControls();
+
+			// Check for when destination is reached and update seat destination if needed
+			StartCoroutine(CheckVehicleDestinationReached(vehicleManager, selectedSeat));
+		}
+
+		
+
+		IEnumerator CheckVehicleDestinationReached(VehicleManager vehicleManager, VehicleSeat selectedSeat)
+		{
+			while (true)
+			{
+				if (state == PlayerState.Movement)
+				{
+					if (!ai.navMeshAgent.enabled)
+					{
+						ai.EnableAgent(selectedSeat.movePosition);
+					}
+
+					// Update destination position if the car moves
+					if (ai.navMeshAgent.destination != selectedSeat.movePosition.position)
+					{
+						ai.SetDestination(selectedSeat.movePosition);
+					}
+
+					if (!ai.navMeshAgent.hasPath && ai.navMeshAgent.enabled)
+					{
+						//ai.DisableAgent();
+						OnVehicleInteractionEnter(vehicleManager);
+
+						yield break;
+					}
+				}
+				else
+				{
+					ai.DisableAgent();
+					yield break;
+				}
+				
+
+				yield return new WaitForFixedUpdate();
+			}
+		}
+
+		// Called when control lock gets disabled from an enabled state
+		public void OnVehicleInteractCancel()
+		{
+			StopCoroutine(nameof(CheckVehicleDestinationReached));
+		}
+
+		private void OnVehicleInteractionEnter(VehicleManager vehicleManager)
+		{
+			Debug.Log("Entering vehicle!!");
+
+			// Set Layer to driving layer
+			animations.SetState(1);
+
+			// Play getting in vehicle animation
+
+			vehicles.currentVehicle = vehicleManager;
+
+		}
+
+		private void OnVehicleInteractionExit(VehicleManager vehicleManager)
+		{
+			vehicleManager.input.enabled = false;
+			vehicleManager.input.player = null;
+
+			// Play getting in vehicle animation
+
+			vehicles.currentVehicle = null;
+		}
+
+		// Called from Animation Controller transition
+		public void OnVehicleEnter()
+		{
+			if (vehicles.currentVehicle != null)
+			{
+				VehicleStandardInput vehicleInput = vehicles.currentVehicle.input;
+
+				vehicleInput.enabled = true;
+				vehicleInput.player = this;
+			}
+			else
+			{
+				Debug.LogError("FAILED TO GET CURRENT VEHICLE!");
+			}
+		}
+
+		public void LockControls()
+		{
+			controls.controlLock = true;
+		}
+
+		public void UnlockControls()
+		{
+			controls.controlLock = false;
 		}
 	}
 
@@ -602,16 +689,43 @@ namespace Player
 	[Serializable]
 	public class AI
 	{
+		private PlayerController controller;
 
+		internal NavMeshAgent navMeshAgent;
+		internal Transform wayPoint;
 
-		[Serializable]
-		public class UserControlled
+		internal void Start(PlayerController controller)
 		{
-
+			this.controller = controller;
+			navMeshAgent = controller.GetComponent<NavMeshAgent>();
+			navMeshAgent.enabled = false;
 		}
-		[Serializable]
-		public class SystemControlled
+
+		public void SetDestination(Transform pos)
 		{
+			navMeshAgent.SetDestination(pos.position);
+		}
+
+		internal void EnableAgent(Transform destination)
+		{
+			controller.physics.playerBody.isKinematic = true;
+			navMeshAgent.enabled = true;
+
+			if (navMeshAgent.destination != destination.position)
+			{
+				navMeshAgent.SetDestination(destination.position);
+			}
+
+			Debug.Log("Player AI Enabled!");
+		}
+
+		internal void DisableAgent()
+		{
+			controller.physics.playerBody.isKinematic = false;
+			navMeshAgent.ResetPath();
+			navMeshAgent.enabled = false;
+
+			Debug.Log("Player AI Disabled!");
 
 		}
 	}
@@ -726,6 +840,51 @@ namespace Player
 		{
 			this.controller = controller;
 		}
+
+		internal void ApplyAnimationClips()
+		{
+			AnimatorOverrideController aoc = animator.runtimeAnimatorController as AnimatorOverrideController;
+			Debug.Log(aoc.name + "Override controller created.");
+			if (aoc != null)
+			{
+				// Idle
+				aoc["Idle"] = animationClips.idling.idle;
+				aoc["Crouching Idle"] = animationClips.idling.crouchIdle;
+
+				// Jogging
+				aoc["Jog Forward"] = animationClips.walking.forward;
+				aoc["Jog Backward"] = animationClips.walking.backward;
+				aoc["Jog Strafe Left"] = animationClips.walking.left;
+				aoc["Jog Strafe Right"] = animationClips.walking.right;
+
+				// Running
+				aoc["Run Forward"] = animationClips.running.forward;
+				aoc["Left Strafe"] = animationClips.running.left;
+				aoc["Right Strafe"] = animationClips.running.right;
+
+				// Crouching
+				aoc["Crouched Walking"] = animationClips.crouching.forward;
+				aoc["Crouched Walking Backwards"] = animationClips.crouching.backward;
+				aoc["Crouched Sneaking Left"] = animationClips.crouching.left;
+				aoc["Crouched Sneaking Right"] = animationClips.crouching.left;
+
+				// Climbing
+
+				// Swimming
+
+			}
+			Debug.Log("Applying override controller...");
+			animator.runtimeAnimatorController = aoc;
+			if (animator.runtimeAnimatorController == aoc)
+			{
+				Debug.Log(animator.runtimeAnimatorController.name + "override applied successfully!");
+			}
+		}
+
+		internal void SetState(int e)
+		{
+			animator.SetInteger("State", e);
+		}
 	}
 
 	[Serializable]
@@ -733,23 +892,77 @@ namespace Player
 	{
 		private PlayerController controller;
 
-		private bool controlLock = false;
+		[SerializeField]
+		private float _controlLockTime = 0.25f;
 
+		private float controlLockTime = 0;
+		public bool controlLock = false;
+
+		private bool pressedDuringLock = false;
+		private bool pressedDuringLock1 = false;
 		public float HorizontalMove
 		{
 			get
 			{
 				if (!controlLock)
 				{
+					if (pressedDuringLock)
+					{
+						pressedDuringLock = false;
+					}
+
+					if (controlLockTime <= 0)
+					{
 #if ENABLE_INPUT_SYSTEM
-					return movementAction.ReadValue<Vector2>().x;
+						return movementAction.ReadValue<Vector2>().x;
 #else
-				return Input.GetAxis("Horizontal");
+						return Input.GetAxis("Horizontal");
 #endif
+					}
+					else
+					{
+						return 0;
+					}
 				}
 				else
 				{
-					return 0;
+					if (movementAction.triggered)
+					{
+						if (!pressedDuringLock)
+						{
+							pressedDuringLock = true;
+
+							return 0;
+						}
+						else
+						{
+							if (!pressedDuringLock1)
+							{
+								pressedDuringLock1 = true;
+								return 0;
+							}
+							else
+							{
+								pressedDuringLock = false;
+								pressedDuringLock1 = false;
+								controlLock = false;
+								controller.OnVehicleInteractCancel();
+
+								if (controller.ai.navMeshAgent.enabled)
+								{
+									controller.ai.DisableAgent();
+								}
+
+								return movementAction.ReadValue<Vector2>().x;
+							}
+							
+						}
+					}
+					else
+					{
+						return 0;
+
+					}
 				}
 			}
 		}
@@ -760,15 +973,44 @@ namespace Player
 			{
 				if (!controlLock)
 				{
+					if (controlLockTime <= 0)
+					{
 #if ENABLE_INPUT_SYSTEM
-					return movementAction.ReadValue<Vector2>().y;
+						return movementAction.ReadValue<Vector2>().y;
 #else
 				return Input.GetAxis("Vertical");
 #endif
+					}
+					else
+					{
+						return 0;
+					}
 				}
 				else
 				{
-					return 0;
+					// Comment out because it may run twice? (guess - change if wrong)
+					//if (movementAction.triggered)
+					//{
+					//	if (!pressedDuringLock)
+					//	{
+					//		pressedDuringLock = true;
+					//		return 0;
+					//	}
+					//	else
+					//	{
+					//		pressedDuringLock = false;
+					//		controlLock = false;
+					//		controller.OnVehicleInteractCancel();
+
+					//		if (controller.ai.navMeshAgent.enabled)
+					//		{
+					//			controller.DisableAgent();
+					//		}
+
+					//		return movementAction.ReadValue<Vector2>().x;
+					//	}
+					//}
+					return controller.ai.navMeshAgent.velocity.normalized.magnitude;
 				}
 			}
 		}
@@ -1321,19 +1563,6 @@ namespace Player
 	}
 
 	[Serializable]
-	public class Transitions
-	{
-		private PlayerController controller;
-
-		internal Transform target;
-
-		internal void Start(PlayerController controller)
-		{
-			this.controller = controller;
-		}
-	}
-
-	[Serializable]
 	public class UI
 	{
 		private PlayerController controller;
@@ -1348,6 +1577,24 @@ namespace Player
 		[Space]
 		[SerializeField]
 		internal GameObject interactText;
+		#endregion
+
+		internal void Start(PlayerController controller)
+		{
+			this.controller = controller;
+		}
+	}
+
+	[Serializable]
+	public class Vehicles
+	{
+		private PlayerController controller;
+
+		#region Inspector Variables
+		public VehicleManager currentVehicle;
+
+		[SerializeField]
+		internal float transitionTime = 1;
 		#endregion
 
 		internal void Start(PlayerController controller)

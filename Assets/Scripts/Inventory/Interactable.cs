@@ -5,6 +5,7 @@ using UnityEngine;
 using Player;
 using EVP;
 using Items;
+using System.Web.Mvc;
 
 public class Interactable : MonoBehaviour
 {
@@ -13,9 +14,16 @@ public class Interactable : MonoBehaviour
 	[SerializeField, Tooltip("Useful for picking up items")]
 	private bool autoInteract = false;
 
-	[SerializeField]
-	private float interactDisableTime = 1;
-	private bool canInteract = true;
+	//private float interactDisableTime = 1;
+	//private bool canInteract = true;
+
+	[HideInInspector]
+	public VehicleManager connectedVm = null;
+	[HideInInspector]
+	public Door connectedDoor = null;
+	[HideInInspector]
+	public Item connectedItem = null;
+
 	private void Start()
 	{
 		if (autoInteract)
@@ -44,6 +52,36 @@ public class Interactable : MonoBehaviour
 				Destroy(ai);
 			}
 		}
+
+		string dbg = $"Failed to interact with {gameObject.name}. ";
+
+		if (type == InteractType.Vehicle)
+		{
+			connectedVm = GetComponent<VehicleManager>();
+
+			if (connectedVm == null)
+			{
+				Debug.LogWarning(dbg + "Please check if \"VehicleStandardInput.cs\" is attached.");
+			}
+		}
+		else if (type == InteractType.Item)
+		{
+			connectedItem = GetComponent<Item>();
+
+			if (connectedItem == null)
+			{
+				Debug.LogWarning(dbg + "Please check if \"Item.cs\" is attached.");
+			}
+		}
+		else if (type == InteractType.Door)
+		{
+			connectedDoor = GetComponent<Door>();
+
+			if (connectedDoor == null)
+			{
+				Debug.LogWarning(dbg + "Please check if \"Door.cs\" is attached.");
+			}
+		}
 	}
 
 	public void Interact(PlayerController controller)
@@ -53,21 +91,11 @@ public class Interactable : MonoBehaviour
 		string dbg = $"Failed to interact with {gameObject.name}. ";
 		if (type == InteractType.Vehicle)
 		{
-			var inp = GetComponent<VehicleStandardInput>();
-			var cont = GetComponent<VehicleController>();
+			var inp = connectedVm;
 
-			if (cont == null)
+			if (inp != null && inp.GetSpeed < 30 && inp.GetSpeed > -30)
 			{
-				cont = GetComponentInParent<VehicleController>();
-			}
-			if (inp == null)
-			{
-				inp = GetComponentInParent<VehicleStandardInput>();
-			}
-
-			if (inp != null && cont != null)
-			{
-				VehicleInteraction(controller, inp, cont);
+				VehicleInteraction(controller, inp);
 			}
 			else
 			{
@@ -76,7 +104,8 @@ public class Interactable : MonoBehaviour
 		}
 		else if (type == InteractType.Item)
 		{
-			var itm = GetComponent<Item>();
+			var itm = connectedItem;
+
 			if (itm != null)
 			{
 				ItemInteraction(controller, itm);
@@ -88,7 +117,7 @@ public class Interactable : MonoBehaviour
 		}
 		else if (type == InteractType.Door)
 		{
-			var inp = GetComponent<Door>();
+			var inp = connectedDoor;
 			if (inp != null)
 			{
 				DoorInteraction(controller, inp);
@@ -100,9 +129,9 @@ public class Interactable : MonoBehaviour
 		}
 	}
 
-	void VehicleInteraction(PlayerController controller, VehicleStandardInput vehicleInput, VehicleController vehicleController)
+	void VehicleInteraction(PlayerController controller, VehicleManager vehicleManager)
 	{
-		controller.OnVehicleInteraction(vehicleInput, vehicleController);
+		controller.OnVehicleInteraction(vehicleManager);
 	}
 
 	void ItemInteraction(PlayerController controller, Item item)

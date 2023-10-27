@@ -10,7 +10,6 @@ using System;
 
 namespace EVP
 {
-
 	// TO-DO: raise to Serializable and add a common property "Mode Key" for each mode
 
 	public class CameraMode

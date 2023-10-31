@@ -1,0 +1,8 @@
+newmtl Body
+Kd 0.02745098 0.07843135 0.8588235
+d 1
+
+newmtl Black_Gloss
+Kd 0 0 0
+d 1
+

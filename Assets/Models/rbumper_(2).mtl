@@ -1,0 +1,16 @@
+newmtl Body
+Kd 0.02745098 0.07843135 0.8588235
+d 1
+
+newmtl Black_Gloss
+Kd 0 0 0
+d 1
+
+newmtl Honda_CivicTypeR_2017Coloured_Material
+Kd 0.3102777 0.3102777 0.3102777
+d 1
+
+newmtl tailight1
+Kd 0.7417775 0 0
+d 1
+

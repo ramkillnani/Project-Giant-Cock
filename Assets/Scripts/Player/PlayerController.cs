@@ -456,7 +456,6 @@ namespace Player
 			if (vehicles.currentVehicle != null)
 			{
 				animations.animator.SetBool("IsDriver", vehicles.currentVehicle.GetSeatFromPlayer(this).isDriver);
-
 			}
 		}
 
@@ -529,7 +528,14 @@ namespace Player
 
 		void AttachItem(Item item)
 		{
+			if (item == vehicles.currentVehicle)
+			{
 
+			}
+			else
+			{
+
+			}
 		}
 
 		public void OnVehicleInteraction(VehicleManager vehicleManager)
@@ -672,7 +678,8 @@ namespace Player
 						Debug.Log("Player should be looking at door handle");
 						// Remove this as it should be run from an animation state behaviour
 						vehicles.currentVehicle = vehicleManager;
-						inventory.curItem = vehicleManager;
+						OnItemInteraction(vehicleManager);
+
 						OnVehicleEnter();
 						yield break;
 					}
@@ -1400,6 +1407,7 @@ namespace Player
 
 		internal Item curItem;
 
+		[SerializeField]
 		internal List<Item> inventory = new List<Item>();
 
 		[SerializeField]
@@ -1412,13 +1420,22 @@ namespace Player
 
 		internal void Add(Item item)
 		{
-			if (inventory.Count < size)
+			if (item != controller.vehicles.currentVehicle)
 			{
-				inventory.Add(item);
+				if (inventory.Count < size)
+				{
+					inventory.Add(item);
+					curItem = item;
+				}
+				else
+				{
+					Debug.Log("Inventory is maxed out bitch");
+				}
 			}
 			else
 			{
-				Debug.Log("Inventory is maxed out bitch");
+				Debug.Log("Current item set to " + item.ItemName + ". This should be a vehicle");
+				curItem = item;
 			}
 		}
 	}
@@ -1525,6 +1542,7 @@ namespace Player
 	[Serializable]
 	public class Networking
 	{
+		private PlayerController controller;
 		// Leaving this here as an empty placeholder for future projects
 	}
 

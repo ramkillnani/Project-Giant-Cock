@@ -123,7 +123,10 @@ namespace Items
 		#region Call from player script
 		public void AddToInventory(PlayerController controller)
 		{
+			// Set the current player
 			this.controller = controller;
+
+			// Play sound when added to inventory
 			if (Sound.OnAddToInventory.clips != null && Sound.OnAddToInventory.clips.Length > 0)
 			{
 				PlaySound(Sound.OnAddToInventory);
@@ -227,26 +230,29 @@ namespace Items
 
 		void EnablePhysics(bool start)
 		{
-			if (start)
+			if (GetType() != typeof(VehicleManager))
 			{
-				CheckPhysics();
-
-				if (droppedRotationPhysics)
+				if (start)
 				{
-					droppedRigidbody.freezeRotation = true;
+					CheckPhysics();
+
+					if (droppedRotationPhysics)
+					{
+						droppedRigidbody.freezeRotation = true;
+					}
+
+					droppedRigidbody.isKinematic = false;
+					droppedCollider.enabled = true;
+
+					// TODO: Force rigidbody to sleep until item is dropped
 				}
+				else
+				{
+					CheckPhysics();
 
-				droppedRigidbody.isKinematic = false;
-				droppedCollider.enabled = true;
-				
-				// TODO: Force rigidbody to sleep until item is dropped
-			}
-			else
-			{
-				CheckPhysics();
-
-				droppedRigidbody.isKinematic = true;
-				droppedCollider.enabled = false;
+					droppedRigidbody.isKinematic = true;
+					droppedCollider.enabled = false;
+				}
 			}
 		}
 		#endregion
@@ -285,10 +291,12 @@ namespace Items
 			
 		}
 
-		// OnEquip is called when the player unequips the item
+		/// <summary>
+		/// OnUnequip is called when the player unequips the item.
+		/// </summary>
 		protected virtual void OnUnequip()
 		{
-			PlaySound(Sound.OnUnequip);
+
 		}
 
 		void DetermineAndPlayAudio(SoundCollection audio)

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c509dbaa7b6f416409e3195321a2187e, type: 3}
+  m_Name: Terrain Layer Palette
+  m_EditorClassIdentifier: 
+  PaletteLayers:
+  - {fileID: 8574412962073106934, guid: 47edd6748e0f7ee4cbb4f8960f2bd439, type: 2}
+  - {fileID: 8574412962073106934, guid: c2cafa1bc79598c42a9b857361b6d854, type: 2}
+  - {fileID: 8574412962073106934, guid: 336b5ca9586bfd043be440251ef0d626, type: 2}
+  - {fileID: 8574412962073106934, guid: 5d7a6a0571b59394f89736b7f6681379, type: 2}
+  - {fileID: 8574412962073106934, guid: 35950a3a66d8cdd429fa0d453f50d063, type: 2}
+  - {fileID: 8574412962073106934, guid: 82c8369c4c20fdb419d544fadb8fda8b, type: 2}

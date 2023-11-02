@@ -1,0 +1,10 @@
+
+
+HDRP version notes:
+- Grass is not supported in HDRP terrain system (by unity)   
+- So wind is not supported too as grass by unity
+
+Grass and wind settings works well on Built-In pipeline   
+
+
+

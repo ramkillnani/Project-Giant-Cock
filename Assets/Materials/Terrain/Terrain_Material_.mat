@@ -102,7 +102,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _Displacement_1: 0.1
     - _Displacement_2: 0
-    - _Displacement_3: 0
+    - _Displacement_3: 0.51
     - _Displacement_4: 0
     - _Displacement_5: 0
     - _Displacement_6: 0
@@ -120,7 +120,7 @@ Material:
     - _Layer_2_Offset: 0
     - _Layer_3TrailMultiplier: 0
     - _Layer_3TrailNormalStrength: 0
-    - _Layer_3_Offset: 0
+    - _Layer_3_Offset: -1
     - _Layer_4TrailMultiplier: 0
     - _Layer_4TrailNormalStrength: 0
     - _Layer_4_Offset: 0
@@ -169,7 +169,7 @@ Material:
     - _Specular_Color_6: {r: 0, g: 0, b: 0, a: 0}
     - _UV_0: {r: 300, g: 300, b: 0, a: 0}
     - _UV_1: {r: 0, g: 0, b: 0, a: 0}
-    - _UV_2: {r: 0, g: 0, b: 0, a: 0}
+    - _UV_2: {r: 300, g: 300, b: 0, a: 0}
     - _UV_3: {r: 0, g: 0, b: 0, a: 0}
     - _UV_4: {r: 0, g: 0, b: 0, a: 0}
     - _UV_5: {r: 0, g: 0, b: 0, a: 0}

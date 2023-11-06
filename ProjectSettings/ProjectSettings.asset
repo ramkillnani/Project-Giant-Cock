@@ -774,6 +774,7 @@ PlayerSettings:
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
     Standalone: THE_VEGETATION_ENGINE;EASYROADS3D_PRO;AMPLIFY_SHADER_EDITOR;UNISTORM_PRESENT
+    iPhone: UNISTORM_PRESENT;EASYROADS3D_PRO;AMPLIFY_SHADER_EDITOR
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

@@ -4,6 +4,6 @@ Make sure to purchase this package before any release of this project and update
 
 To create the tessellation, we need to make sure that we add an alpha channel on the main texture, paste the texture's normal map and greyscale it.
 
-When adding this project from GitHub, the terrain may not be displayed correctly. To fix, click the terrain and reset "LB_Terrain_2", set layers to Layer_6 (only layer6 works for URP) and then press the button. Tessellation values will need to be reset.
+When adding this project from GitHub, the terrain may not be displayed correctly. To fix, click the terrain copy and reset "LB_Terrain_2", set layers to Layer_6 (only layer6 works for URP) and then press the init button. Tessellation values will need to be re-set
 
 If Tessellation is being spastic (such as the tessellation being spread out way too much), make sure there are bumps or hills in the terrain to force the tessellation quality.

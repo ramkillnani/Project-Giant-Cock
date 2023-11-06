@@ -43,7 +43,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 0ae6ee93c4c5c464a86dbffad016bb06, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -100,6 +100,7 @@ Material:
     - _ElementLayerValue: 0
     - _ElementLayerVegetationMessage: 0
     - _ElementLayerWarning: 0
+    - _ElementMessage: 0
     - _ElementMotionMode: 15
     - _ElementRaycastEndValue: 2
     - _ElementRaycastMask: 1
@@ -154,7 +155,9 @@ Material:
     - _SeasonMode_Seasons: 0
     - _SeasonMode_Simple: 0
     - _SmoothnessTextureChannel: 0
+    - _SpaceTexture: 0
     - _SpecularHighlights: 1
+    - _SpeedTresholdValue: 10
     - _SpringValue: 0
     - _SrcBlend: 1
     - _SummerValue: 0
@@ -176,9 +179,11 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MainTexAlphaRemap: {r: 0, g: 1, b: 0, a: 0}
     - _MainTexColorRemap: {r: 0, g: 1, b: 0, a: 0}
+    - _MainTexFallofRemap: {r: 0, g: 0, b: 0, a: 0}
     - _MainTexRemap: {r: 0, g: 1, b: 0, a: 0}
     - _MainUVs: {r: 1, g: 1, b: 0, a: 0}
     - _NoiseRemap: {r: 0, g: 1, b: 0, a: 0}
+    - _SeasonRemap: {r: 0, g: 0, b: 0, a: 0}
     - _SpringColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     - _SummerColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     - _WinterColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}

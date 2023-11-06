@@ -10,7 +10,6 @@ using EVP;
 using System.Linq;
 using UnityEngine.AI;
 using System.Threading;
-using System.Net.PeerToPeer.Collaboration;
 
 // Brackets show this - ("What adding this functionality will do for this script/How important it is to finish")
 // TODO (Functionality/High): cull out character if camera is in first person
@@ -18,6 +17,7 @@ using System.Net.PeerToPeer.Collaboration;
 // TODO (Performance/Low): Create private variables which get set from the serialized variables. This will make it harder to
 // hack, and increase performance. It will also allow us to create scriptable objects for the player variables
 // which will be handy if this player controller is used in future projects.
+// TODO: Auto set character hieght from all child model meshes. Check for the highest and lowest vertices, and get the distance from between.
 
 namespace Player
 {
@@ -393,6 +393,14 @@ namespace Player
 
 			GameObject playerModel = Instantiate(models.playerModels[index].prefab, models.modelTransform);
 			Animator animator = playerModel.GetComponent<Animator>();
+			var playerMeshes = playerModel.GetComponentsInChildren<MeshRenderer>();
+
+			// Set player model to shadows only
+			for (int i = 0; i < playerMeshes.Length; i++)
+			{
+				playerMeshes[i].shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+			}
+
 			if (!animator)
 			{
 				playerModel.AddComponent(typeof(Animator));
@@ -554,7 +562,7 @@ namespace Player
 			}
 		}
 
-		void SetVehicleWaypoint(VehicleManager vehicleManager)
+		VehicleSeat GetAvailableVehicleSeat(VehicleManager vehicleManager)
 		{
 			VehicleSeat selectedSeat = null;
 
@@ -582,6 +590,13 @@ namespace Player
 				selectedSeat = handleDistances.OrderBy(kvp => kvp.Value).First().Key;
 			}
 
+			return selectedSeat;
+		}
+
+		void SetVehicleWaypoint(VehicleManager vehicleManager)
+		{
+			VehicleSeat selectedSeat = GetAvailableVehicleSeat(vehicleManager);
+
 			selectedSeat.seatedPlayer = this;
 
 			// Set destination to the selected vehicle's seat
@@ -597,6 +612,8 @@ namespace Player
 
 		IEnumerator CheckVehicleDestinationReached(VehicleManager vehicleManager, VehicleSeat selectedSeat)
 		{
+			Debug.Log("Starting vehicle distance check");
+
 			while (true)
 			{
 				if (state == PlayerState.Movement)
@@ -639,6 +656,7 @@ namespace Player
 		{
 			StopCoroutine(nameof(CheckVehicleDestinationReached));
 			animations.SetState(0);
+			ai.DisableAgent();
 		}
 
 		private void OnVehicleInteractionEnter(VehicleManager vehicleManager, VehicleSeat seat)
@@ -673,14 +691,13 @@ namespace Player
 					// Apply Rotation
 					transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), 5 * Time.deltaTime);
 
-					if (Vector3.Distance(transform.rotation.eulerAngles, Quaternion.LookRotation(direction).eulerAngles) < 0.1f)
+					if (Vector3.Distance(transform.rotation.eulerAngles, Quaternion.LookRotation(direction).eulerAngles) < ai.doorLookthreshold)
 					{
 						Debug.Log("Player should be looking at door handle");
 						// Remove this as it should be run from an animation state behaviour
-						vehicles.currentVehicle = vehicleManager;
-						OnItemInteraction(vehicleManager);
+						
 
-						OnVehicleEnter();
+						OnVehicleEnter(vehicleManager);
 						yield break;
 					}
 
@@ -706,11 +723,21 @@ namespace Player
 		}
 
 		// Called from Animation Controller transition
-		public void OnVehicleEnter()
+		public void OnVehicleEnter(VehicleManager vehicle)
 		{
-			if (vehicles.currentVehicle != null)
+			if (vehicle != null)
 			{
-				VehicleStandardInput vehicleInput = vehicles.currentVehicle.input;
+				var selectedSeat = GetAvailableVehicleSeat(vehicle);
+
+				if (selectedSeat.seatedPlayer != this)
+				{
+					selectedSeat.seatedPlayer = this;
+				}
+
+				vehicles.currentVehicle = vehicle;
+				OnItemInteraction(vehicle);
+
+				VehicleStandardInput vehicleInput = vehicle.input;
 
 				vehicleInput.enabled = true;
 				vehicleInput.player = this;
@@ -783,6 +810,8 @@ namespace Player
 
 		[SerializeField]
 		internal float stoppingDistance = 0.3f;
+		[SerializeField]
+		internal float doorLookthreshold = 1f;
 
 		internal void Start(PlayerController controller)
 		{

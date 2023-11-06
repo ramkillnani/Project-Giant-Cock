@@ -673,6 +673,80 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!21 &841699395
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Element
+  m_Shader: {fileID: 4800000, guid: 4776cc0409f0f4e4da64e5837bff4b0d, type: 3}
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AdditionalValue1: 1
+    - _AdditionalValue2: 1
+    - _AdditionalValue3: 1
+    - _AdditionalValue4: 1
+    - _CategoryElement: 0
+    - _CategoryFade: 0
+    - _CategoryRender: 0
+    - _ElementBlendA: 0
+    - _ElementDirectionMode: 20
+    - _ElementFadeSupport: 0
+    - _ElementIntensity: 1
+    - _ElementLayerMask: 1
+    - _ElementLayerMessage: 0
+    - _ElementLayerValue: 0
+    - _ElementLayerWarning: 0
+    - _ElementMessage: 0
+    - _ElementMode: 0
+    - _ElementRaycastMode: 0
+    - _ElementUVsMode: 0
+    - _ElementVolumeFadeMode: 0
+    - _InvertX: 0
+    - _IsElementShader: 1
+    - _IsVersion: 1100
+    - _IsVertexElement: 1
+    - _MainTexAlphaMaxValue: 1
+    - _MainTexAlphaMinValue: 0
+    - _MainTexColorMaxValue: 1
+    - _MainTexColorMinValue: 0
+    - _MainTexFallofMaxValue: 0
+    - _MainTexFallofMinValue: 0
+    - _MainValue: 0
+    - _RaycastDistanceEndValue: 2
+    - _RaycastLayerMask: 1
+    - _SeasonMaxValue: 1
+    - _SeasonMinValue: 0
+    - _SpaceTexture: 0
+    - _SpeedTresholdValue: 10
+    - _render_dst: 0
+    - _render_src: 2
+    m_Colors:
+    - _ElementParams: {r: 1, g: 1, b: 1, a: 1}
+    - _MainTexAlphaRemap: {r: 0, g: 0, b: 0, a: 0}
+    - _MainTexColorRemap: {r: 0, g: 0, b: 0, a: 0}
+    - _MainTexFallofRemap: {r: 0, g: 0, b: 0, a: 0}
+    - _MainUVs: {r: 1, g: 1, b: 0, a: 0}
+    - _NoiseRemap: {r: 0, g: 0, b: 0, a: 0}
+    - _SeasonRemap: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1001 &956624301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1543,7 +1617,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1894003836}
+  - {fileID: 841699395}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2105,80 +2179,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1846972330}
   m_PrefabAsset: {fileID: 0}
---- !u!21 &1894003836
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Element
-  m_Shader: {fileID: 4800000, guid: 4776cc0409f0f4e4da64e5837bff4b0d, type: 3}
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AdditionalValue1: 1
-    - _AdditionalValue2: 1
-    - _AdditionalValue3: 1
-    - _AdditionalValue4: 1
-    - _CategoryElement: 0
-    - _CategoryFade: 0
-    - _CategoryRender: 0
-    - _ElementBlendA: 0
-    - _ElementDirectionMode: 20
-    - _ElementFadeSupport: 0
-    - _ElementIntensity: 1
-    - _ElementLayerMask: 1
-    - _ElementLayerMessage: 0
-    - _ElementLayerValue: 0
-    - _ElementLayerWarning: 0
-    - _ElementMessage: 0
-    - _ElementMode: 0
-    - _ElementRaycastMode: 0
-    - _ElementUVsMode: 0
-    - _ElementVolumeFadeMode: 0
-    - _InvertX: 0
-    - _IsElementShader: 1
-    - _IsVersion: 1100
-    - _IsVertexElement: 1
-    - _MainTexAlphaMaxValue: 1
-    - _MainTexAlphaMinValue: 0
-    - _MainTexColorMaxValue: 1
-    - _MainTexColorMinValue: 0
-    - _MainTexFallofMaxValue: 0
-    - _MainTexFallofMinValue: 0
-    - _MainValue: 0
-    - _RaycastDistanceEndValue: 2
-    - _RaycastLayerMask: 1
-    - _SeasonMaxValue: 1
-    - _SeasonMinValue: 0
-    - _SpaceTexture: 0
-    - _SpeedTresholdValue: 10
-    - _render_dst: 0
-    - _render_src: 2
-    m_Colors:
-    - _ElementParams: {r: 1, g: 1, b: 1, a: 1}
-    - _MainTexAlphaRemap: {r: 0, g: 0, b: 0, a: 0}
-    - _MainTexColorRemap: {r: 0, g: 0, b: 0, a: 0}
-    - _MainTexFallofRemap: {r: 0, g: 0, b: 0, a: 0}
-    - _MainUVs: {r: 1, g: 1, b: 0, a: 0}
-    - _NoiseRemap: {r: 0, g: 0, b: 0, a: 0}
-    - _SeasonRemap: {r: 0, g: 0, b: 0, a: 0}
-  m_BuildTextureStacks: []
 --- !u!1 &1908294989
 GameObject:
   m_ObjectHideFlags: 0

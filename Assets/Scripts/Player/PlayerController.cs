@@ -723,6 +723,10 @@ namespace Player
 		}
 
 		// Called from Animation Controller transition
+		/// <summary>
+		/// Attaches a player to a vehicle.
+		/// </summary>
+		/// <param name="vehicle"></param>
 		public void OnVehicleEnter(VehicleManager vehicle)
 		{
 			if (vehicle != null)

@@ -93,6 +93,151 @@ MonoBehaviour:
   cropToFit:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &-6272033439817178715
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9392aacf3349be549bb1fd9eece49154, type: 3}
+  m_Name: ButoVolumetricFog
+  m_EditorClassIdentifier: 
+  active: 1
+  mode:
+    m_OverrideState: 1
+    m_Value: 1
+  qualityLevel:
+    m_OverrideState: 1
+    m_Value: 4
+  depthInteractionMode:
+    m_OverrideState: 1
+    m_Value: 1
+  rayLengthMode:
+    m_OverrideState: 1
+    m_Value: 0
+  sampleCount:
+    m_OverrideState: 1
+    m_Value: 32
+  animateSamplePosition:
+    m_OverrideState: 1
+    m_Value: 0
+  selfShadowingEnabled:
+    m_OverrideState: 1
+    m_Value: 0
+  maximumSelfShadowingOctaves:
+    m_OverrideState: 1
+    m_Value: 1
+  horizonShadowingEnabled:
+    m_OverrideState: 1
+    m_Value: 0
+  maxDistanceVolumetric:
+    m_OverrideState: 1
+    m_Value: 64
+  analyticFogEnabled:
+    m_OverrideState: 1
+    m_Value: 1
+  maxDistanceAnalytic:
+    m_OverrideState: 1
+    m_Value: 1000
+  distantFogDensity:
+    m_OverrideState: 1
+    m_Value: 4.02
+  distantFogStartDistance:
+    m_OverrideState: 1
+    m_Value: 0
+  temporalAntiAliasingEnabled:
+    m_OverrideState: 1
+    m_Value: 0
+  temporalAntiAliasingIntegrationRate:
+    m_OverrideState: 1
+    m_Value: 0.03
+  depthSofteningDistance:
+    m_OverrideState: 1
+    m_Value: 1
+  fogDensity:
+    m_OverrideState: 1
+    m_Value: 10
+  anisotropy:
+    m_OverrideState: 1
+    m_Value: 0.2
+  lightIntensity:
+    m_OverrideState: 1
+    m_Value: 0.1
+  shadowIntensity:
+    m_OverrideState: 1
+    m_Value: 1.43
+  baseHeight:
+    m_OverrideState: 1
+    m_Value: 0
+  attenuationBoundarySize:
+    m_OverrideState: 1
+    m_Value: 10
+  distantBaseHeight:
+    m_OverrideState: 1
+    m_Value: 0
+  distantAttenuationBoundarySize:
+    m_OverrideState: 1
+    m_Value: 100
+  litColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.23239583, g: 0.29616123, b: 0.6415094, a: 1}
+  shadowedColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.030758264, g: 0.07303341, b: 0.2264151, a: 1}
+  emitColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.6945511, g: 0.24905658, b: 1, a: 1}
+  colorRamp:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+  colorInfluence:
+    m_OverrideState: 1
+    m_Value: 0.254
+  directionalForward:
+    m_OverrideState: 1
+    m_Value: {r: 0.8207547, g: 0.5218761, b: 0.5218761, a: 1}
+  directionalBack:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  directionalRatio:
+    m_OverrideState: 1
+    m_Value: 5
+  noiseTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+  octaves:
+    m_OverrideState: 1
+    m_Value: 1
+  lacunarity:
+    m_OverrideState: 1
+    m_Value: 2
+  gain:
+    m_OverrideState: 1
+    m_Value: 0.3
+  noiseTiling:
+    m_OverrideState: 1
+    m_Value: 30
+  noiseWindSpeed:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: -1, z: 0}
+  noiseMap:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 1}
+  volumeNoise:
+    m_OverrideState: 1
+    m_Value:
+      frequency: 8
+      octaves: 4
+      lacunarity: 2
+      gain: 0.35
+      seed: 69
+      noiseType: 2
+      noiseQuality: 1
+      invert: 0
+      userTexture: {fileID: 0}
 --- !u!114 &-4062481241321750826
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -108,7 +253,7 @@ MonoBehaviour:
   active: 1
   mode:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 2
 --- !u!114 &-3672302446107336018
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -189,6 +334,7 @@ MonoBehaviour:
   - {fileID: 6171856910063173997}
   - {fileID: -6880991069948202278}
   - {fileID: -2847012291543010912}
+  - {fileID: -6272033439817178715}
 --- !u!114 &2137860712678319600
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -204,13 +350,13 @@ MonoBehaviour:
   active: 1
   type:
     m_OverrideState: 1
-    m_Value: 5
+    m_Value: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.751
+    m_Value: 0.687
   response:
     m_OverrideState: 1
-    m_Value: 0.97
+    m_Value: 0.655
   texture:
     m_OverrideState: 0
     m_Value: {fileID: 0}

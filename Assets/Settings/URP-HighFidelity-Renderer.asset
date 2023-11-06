@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    isEnabled: 1
+    isEnabled: 0
     renderPassEvent: 500
     resolution: 1
     screenBlendMode: 0
-    celestialName: 
-    radialBlurIterations: 2
-    sunColor: {r: 1, g: 1, b: 1, a: 1}
-    sunThreshold: {r: 0.87, g: 0.74, b: 0.65, a: 1}
-    sunShaftBlurRadius: 2.5
-    sunShaftIntensity: 1.15
-    maxRadius: 0.75
+    celestialName: UniStorm Moon
+    radialBlurIterations: 3
+    sunColor: {r: 0.31764707, g: 0.32156864, b: 0.32156864, a: 1}
+    sunThreshold: {r: 0.13333334, g: 0.13333334, b: 0.13333334, a: 1}
+    sunShaftBlurRadius: 3.32
+    sunShaftIntensity: 1
+    maxRadius: 0.3
     useDepthTexture: 1
 --- !u!114 &-7124470355015351812
 MonoBehaviour:
@@ -40,7 +40,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    isEnabled: 1
+    isEnabled: 0
     renderPassEvent: 400
     Fade: 0.33
     CloudShadowTexture: {fileID: 0}
@@ -68,18 +68,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    isEnabled: 1
+    isEnabled: 0
     renderPassEvent: 500
     resolution: 1
     screenBlendMode: 0
-    celestialName: 
+    celestialName: UniStorm Sun
     radialBlurIterations: 2
-    sunColor: {r: 1, g: 1, b: 1, a: 1}
-    sunThreshold: {r: 0.87, g: 0.74, b: 0.65, a: 1}
-    sunShaftBlurRadius: 2.5
-    sunShaftIntensity: 1.15
-    maxRadius: 0.75
+    sunColor: {r: 0.78431374, g: 0.654902, b: 0.3882353, a: 1}
+    sunThreshold: {r: 0.5568628, g: 0.5372549, b: 0.48235294, a: 1}
+    sunShaftBlurRadius: 4.86
+    sunShaftIntensity: 1
+    maxRadius: 0.5
     useDepthTexture: 1
+--- !u!114 &-4302850668506284300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96dab975e69883249a56554e791c4fd0, type: 3}
+  m_Name: ButoRenderFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings:
+    renderPassEvent: 450
 --- !u!114 &-1878332245247344467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,7 +139,8 @@ MonoBehaviour:
   - {fileID: 6560423319535702766}
   - {fileID: -5510216749472790435}
   - {fileID: -8525208545597910555}
-  m_RendererFeatureMap: adc0de57c6d2eee5
+  - {fileID: -4302850668506284300}
+  m_RendererFeatureMap: adc0de57c6d2eee5f47e214e1d3449c4
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -180,22 +196,22 @@ MonoBehaviour:
   settings:
     isEnabled: 1
     renderPassEvent: 400
-    NoiseTexture: {fileID: 0}
+    NoiseTexture: {fileID: 2800000, guid: e09deeeaec0a3c547a3b72ad3d615255, type: 2}
     Dither: 0
     distanceFog: 1
-    useRadialDistance: 0
+    useRadialDistance: 1
     heightFog: 0
     height: 1
     heightDensity: 2
     startDistance: 0
-    SunColor: {r: 1, g: 0.63529, b: 0, a: 1}
-    MoonColor: {r: 1, g: 0.63529, b: 0, a: 1}
+    SunColor: {r: 0, g: 0, b: 0, a: 1}
+    MoonColor: {r: 0.33023313, g: 0.36793935, b: 0.38679242, a: 1}
     TopColor: {r: 0, g: 0, b: 0, a: 0}
-    BottomColor: {r: 0, g: 0, b: 0, a: 0}
-    BlendHeight: 0.03
+    BottomColor: {r: 0.1302065, g: 0.16895631, b: 0.20754719, a: 1}
+    BlendHeight: 0.0443
     FogGradientHeight: 0.5
-    SunIntensity: 2
-    MoonIntensity: 1
+    SunIntensity: 0.3426477
+    MoonIntensity: 0.12677556
     SunFalloffIntensity: 9.4
-    SunControl: 1
-    MoonControl: 1
+    SunControl: -0.019485334
+    MoonControl: 1.1823722
